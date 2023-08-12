@@ -3,49 +3,97 @@
 
 #include <Arduino.h>
 #include "ThreeWayValve.h"
-#include "Thermistor.h"
+#include "ITemperatureSensor.h"
+#include "IComponent.h"
+#include "IRelay.h"
 
-
-class HeatCircuit {
-private:
-  Thermistor thermistor;
-  int relayPin;
-  float targetTemperature;
-  ThreeWayValve threeWayValve;
-
-float heatingCurve(float currentOutsideTemp)
+class HeatCircuit : public IComponent
 {
-  // Implement the heating curve calculation based on the outside temperature.
-  // Adjust this function to fit your specific heating requirements.
-  const float desiredIndoorTempAtZero = 21.0;
-  const float heatingSlope = 0.5;
+private:
+  ITemperatureSensor *temperatureSensor;
+  float targetTemperature; 
+  ThreeWayValve *threeWayValve;
+  IRelay *waterPump;
 
-  float desiredIndoorTemp = desiredIndoorTempAtZero + (currentOutsideTemp * heatingSlope);
-  return desiredIndoorTemp;
-}
+  float hysteresis; // Private member for hysteresis value
 
-public:
-  HeatCircuit(int thermistorPin, int relayPin, float targetTemp)
-      : thermistor(thermistorPin), relayPin(relayPin), targetTemperature(targetTemp) {
-    pinMode(relayPin, OUTPUT);
-    digitalWrite(relayPin, LOW);
+  float heatingCurve(float currentOutsideTemp)
+  {
+    // Implement the heating curve calculation based on the outside temperature.
+    // Adjust this function to fit your specific heating requirements.
+    const float desiredIndoorTempAtZero = 21.0;
+    const float heatingSlope = 0.5;
+
+    float desiredIndoorTemp = desiredIndoorTempAtZero + (currentOutsideTemp * heatingSlope);
+    return desiredIndoorTemp;
   }
 
-  void controlHeating() {
+public:
+  HeatCircuit(ITemperatureSensor *hcTemeraturSensor, ThreeWayValve *threeWayValve, IRelay *waterPump, float targetTemp)
+      : temperatureSensor(hcTemeraturSensor),
+        targetTemperature(targetTemp),
+        threeWayValve(threeWayValve),
+        waterPump(waterPump)
+  {
+  }
 
-    float currentTemp = thermistor.readTemperature();
+  void controlHeating()
+  {
+    float currentTemp = temperatureSensor->getTemperatureCelsius();
 
-    if (currentTemp < targetTemperature) {
-      digitalWrite(relayPin, HIGH);
-    } else {
-      digitalWrite(relayPin, LOW);
+    // Apply hysteresis around the target temperature
+    if (currentTemp < targetTemperature - 10.0)
+    {
+      threeWayValve->moveToCHot();
+    }
+    else if (currentTemp > targetTemperature + 10.0)
+    {
+      threeWayValve->moveToCold();
+    }
+
+    // Ensure the absolute maximum temperature is not exceeded
+    if (currentTemp > 70.0)
+    {
+      threeWayValve->moveToCold(); // Move to cold to prevent overheating
+    }
+
+    // Turn on the water pump if the current temperature is below the target temperature minus 0.5 degrees
+    if (currentTemp < targetTemperature - 0.5)
+    {
+      waterPump->open();
+    }
+    else
+    {
+      waterPump->close();
     }
   }
 
-  void update(float currentOutsideTemp) {
+  void setOutsideTemperatue(float currentOutsideTemp)
+  {
     float desiredIndoorTemp = heatingCurve(currentOutsideTemp);
     targetTemperature = desiredIndoorTemp;
+  }
+
+  void initialize() override
+  {
+    waterPump->close();
+  }
+
+  void update() override
+  {
     controlHeating();
+  }
+
+   // Getter method for hysteresis
+  float getHysteresis() const
+  {
+    return hysteresis;
+  }
+
+  // Setter method for hysteresis
+  void setHysteresis(float value)
+  {
+    hysteresis = value;
   }
 };
 

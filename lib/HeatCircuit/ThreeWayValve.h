@@ -2,24 +2,28 @@
 #define THREE_WAY_MIXER_H
 
 #include <Arduino.h>
-#include "SingleRelay.h"
+#include <IRelay.h>
 
 /// @brief Controls a three-way valve
 class ThreeWayValve
 {
 private:
     /* data */
-SingleRelay openHotRelay;
-SingleRelay openColdRelay;
+IRelay* openHotRelay;
+IRelay* openColdRelay;
 
 public:
-    ThreeWayValve(/* args */);
+    ThreeWayValve(IRelay* openHotRelay, IRelay* openColdRelay);
     ~ThreeWayValve();
     void update();
+    void moveToCold();
+    void moveToCHot();
 };
 
-ThreeWayValve::ThreeWayValve(/* args */)
+ThreeWayValve::ThreeWayValve(IRelay* openHotRelay, IRelay* openColdRelay)
 {
+    this->openHotRelay = openHotRelay;
+    this->openColdRelay = openColdRelay;
 }
 
 ThreeWayValve::~ThreeWayValve()
@@ -28,8 +32,14 @@ ThreeWayValve::~ThreeWayValve()
 
 void ThreeWayValve::update()
 {
-    openHotRelay.turnOn();
-    openColdRelay.turnOff();
+
 }
 
+void ThreeWayValve::moveToCold(){
+
+}
+
+void ThreeWayValve::moveToCHot(){
+
+}
 #endif // !THREE_WAY_MIXER_H
