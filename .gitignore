@@ -34,3 +34,6 @@
 #VSCode
 .pio
 .vscode
+
+# accept anything in the tools folder
+!tools/*
