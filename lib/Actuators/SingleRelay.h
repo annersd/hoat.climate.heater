@@ -5,59 +5,91 @@
 #include <ArduinoLog.h>
 #include "IRelay.h"
 
+/**
+ * @class SingleRelay
+ * @brief Represents a single relay device.
+ *        This class implements the IRelay interface and provides methods for controlling and querying the state of the relay.
+ */
 class SingleRelay : public IRelay {
 private:
-    int pin;
-    RelayState normalState;
-    RelayState currentState;
+    int pin;                 ///< The pin number connected to the relay.
+    RelayState normalState;  ///< The normal state (open or closed) of the relay.
+    RelayState currentState; ///< The current state (open or closed) of the relay.
 
 public:
-    SingleRelay() : pin(0), normalState(RelayState::CLOSED), currentState(RelayState::CLOSED) {}
+    /**
+     * @brief Default constructor.
+     *        Creates a SingleRelay object with default values.
+     */
+    SingleRelay();
 
-    SingleRelay(int relayPin, RelayState defaultNormalState = RelayState::CLOSED)
-        : pin(relayPin), normalState(defaultNormalState), currentState(defaultNormalState) {
-        pinMode(pin, OUTPUT);
-        setRelayState(currentState);
-    }
+    /**
+     * @brief Constructor with pin and default normal state.
+     * @param relayPin The pin number connected to the relay.
+     * @param defaultNormalState The default normal state of the relay (open or closed).
+     */
+    SingleRelay(int relayPin, RelayState defaultNormalState = RelayState::CLOSED);
 
-    void close() override {
-        setRelayState(RelayState::CLOSED);
-    }
+    // Methods to control the relay
 
-    void open() override {
-        setRelayState(RelayState::OPENED);
-    }
+    /**
+     * @brief Close the relay (set to the normal state).
+     *        This method closes the relay and sets it to its normal state.
+     */
+    void close() override;
 
-    void toggle() override {
-        setRelayState(currentState == RelayState::CLOSED ? RelayState::OPENED : RelayState::CLOSED);
-    }
+    /**
+     * @brief Open the relay (opposite of the normal state).
+     *        This method opens the relay, which is the opposite of its normal state.
+     */
+    void open() override;
 
-    RelayState getState() const override {
-        return currentState;
-    }
+    /**
+     * @brief Toggle the relay state.
+     *        This method toggles the relay state between open and closed.
+     */
+    void toggle() override;
 
-    RelayState getNormalState() const override {
-        return normalState;
-    }
+    // Methods to query the relay state
 
-    bool isNormalState() const override {
-        return currentState == normalState;
-    }
+    /**
+     * @brief Get the current state of the relay.
+     * @return The current state of the relay (open or closed).
+     */
+    RelayState getState() const override;
 
-    void update() override {
-        // Nothing to do here
-    }
+    /**
+     * @brief Get the normal state of the relay.
+     * @return The normal state of the relay (open or closed).
+     */
+    RelayState getNormalState() const override;
 
-    void initialize() override {
-        // Nothing to do here
-    }
+    /**
+     * @brief Check if the relay is in its normal state.
+     * @return True if the relay is in its normal state, false otherwise.
+     */
+    bool isNormalState() const override;
+
+    // Update and initialize methods (override from IRelay)
+
+    /**
+     * @brief Update the relay state (no action needed).
+     *        This method is called periodically to update the relay state.
+     */
+    void update() override;
+
+    /**
+     * @brief Initialize the relay (no action needed).
+     *        This method is called during system initialization to prepare the relay for operation.
+     */
+    void initialize() override;
 
 private:
-    void setRelayState(RelayState newState) {
-        Log.infoln("Changing relay state on pin %d to %s", pin, (newState == RelayState::CLOSED ? "CLOSED" : "OPENED"));
-        digitalWrite(pin, newState == normalState ? HIGH : LOW);
-        currentState = newState;
-    }
+    /**
+     * @brief Set the relay state.
+     * @param newState The new state to set (open or closed).
+     */
+    void setRelayState(RelayState newState);
 };
 
 #endif // !SINGLE_RELAY_H

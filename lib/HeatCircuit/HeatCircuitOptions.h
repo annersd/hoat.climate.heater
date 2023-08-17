@@ -11,6 +11,15 @@ public:
           targetTemperature(targetTemperature) {
     }
 
+    HeatCircuitComponentsOptions() {
+        thermistorPin = -1;
+        hotRelayPin = -1;
+        coldRelayPin = -1;
+        pumpRelayPin = -1;
+        targetTemperature = 0.0;
+        
+    }
+
     int getThermistorPin() const {
         return thermistorPin;
     }

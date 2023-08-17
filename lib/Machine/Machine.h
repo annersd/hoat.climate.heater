@@ -1,7 +1,10 @@
 #ifndef MACHINE_H
 #define MACHINE_H
 
-#include <Arduino.h>                     // Include the Arduino library
+
+#include <Arduino.h>    // Include the Arduino library
+#include <ArduinoLog.h> // Include the ArduinoLog library
+
 #include "IComponent.h"                  // Include the IComponent interface
 #include "HeatCircuit.h"                 // Include the HeatCircuit class
 #include "Thermistor.h"                  // Include the Thermistor class
@@ -10,6 +13,12 @@
 #include "ITemperatureSensor.h"          // Include the ITemperatureSensor interface
 #include "SingleRelay.h"                 // Include the SingleRelay class
 #include "HeatCircuitOptions.h"          // Include the HeatCircuitComponentsOptions class
+#include "ITimeLine.h"                   // Include the ITimeLine interface
+#include "IConfiguration.h"              // Include the IConfiguration interface
+#include "Configuration.h"               // Include the Configuration class
+
+#include <iostream>
+#include <string>
 
 class Machine : public IComponent
 {
@@ -23,8 +32,17 @@ private:
     HeatCircuitComponentsOptions optionsFloor;
     HeatCircuitComponentsOptions optionsHeater;
 
-    HeatCircuit *constructHeatingCircuit(HeatCircuitComponentsOptions &options)
+    ITimeline *timeline;
+
+    HeatCircuit *constructHeatingCircuit(IConfiguration *section)
     {
+        HeatCircuitComponentsOptions options(
+            atoi(section->getValue("thermistorPin").c_str()),
+            atoi(section->getValue("hotRelayPin").c_str()),
+            atoi(section->getValue("coldRelayPin").c_str()),
+            atoi(section->getValue("pumpRelayPin").c_str()),
+            atof(section->getValue("targetTemperature").c_str()));
+
         ThermistorTemperatureSensor *ts = new ThermistorTemperatureSensor(
             new Thermistor(options.getThermistorPin(), false, 10000, 10000, 30, 3950, 5));
 
@@ -38,18 +56,16 @@ private:
     }
 
 public:
-    Machine() : isRunning(false),
-            optionsFloor(0, 5, 6, 3, 21.0),  // Initialize options for floor
-            optionsHeater(1, 5, 6, 4, 21.0)  // Initialize options for heater
+    Machine() : isRunning(false)
     {
         // Constructor initialization
-
-
     }
 
     void update() override
     {
         // Update the machine's state or perform periodic tasks
+
+        timeline->update();
 
         // Update the heating circuits
         float tempOutside = hsOutside->getTemperatureCelsius();
@@ -59,17 +75,27 @@ public:
 
         hcHeater->setOutsideTemperatue(tempOutside);
         hcHeater->update();
+
+        // vTaskDelay(1000 );
     }
 
     void initialize()
     {
         // Perform machine initialization tasks here
+        timeline->initialize();
 
-        hcFloor = constructHeatingCircuit(optionsFloor);
-        hcHeater = constructHeatingCircuit(optionsHeater);
+        // Get the section for heating.circuit.floor
+        IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
+        hcFloor = constructHeatingCircuit(floorSection);
+        delete floorSection;
+
+        // Get the section for heating.circuit.heater
+        IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
+        hcHeater = constructHeatingCircuit(heaterSection);
+        delete heaterSection;
 
         // Create outside temperature sensor
-        int THERMISTOR_PIN_3 = 2;
+        int THERMISTOR_PIN_3 = atoi(Config->getValue("heating.circuit.outside.thermistor.pin").c_str());
         hsOutside = new ThermistorTemperatureSensor(
             new Thermistor(THERMISTOR_PIN_3, false, 10000, 10000, 30, 3950, 5));
     }
@@ -91,6 +117,8 @@ public:
     {
         return isRunning;
     }
+
+    IConfiguration *Config = new Configuration();
 };
 
 #endif // MACHINE_H

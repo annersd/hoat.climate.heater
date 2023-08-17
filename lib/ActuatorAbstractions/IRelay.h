@@ -17,7 +17,7 @@ enum class RelayState {
  * @brief The IRelay interface defines a contract for interacting with relay devices.
  * It provides a common set of methods for controlling and querying the state of relay components.
  */
-class IRelay : public IActuator{
+class IRelay : public abstractions::actuators::IActuator{
 public:
     virtual ~IRelay() {}
 
