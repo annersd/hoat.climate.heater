@@ -1,26 +1,25 @@
-#ifndef THREE_WAY_MIXER_H
-#define THREE_WAY_MIXER_H
+#pragma once
 
 #include <Arduino.h>
-#include <IRelay.h>
+#include <abstractions.hpp>
 
 /// @brief Controls a three-way valve
 class ThreeWayValve
 {
 private:
     /* data */
-IRelay* openHotRelay;
-IRelay* openColdRelay;
+abstractions::actuators::IRelay* openHotRelay;
+abstractions::actuators::IRelay* openColdRelay;
 
 public:
-    ThreeWayValve(IRelay* openHotRelay, IRelay* openColdRelay);
+    ThreeWayValve(abstractions::actuators::IRelay* openHotRelay, abstractions::actuators::IRelay* openColdRelay);
     ~ThreeWayValve();
     void update();
     void moveToCold();
     void moveToCHot();
 };
 
-ThreeWayValve::ThreeWayValve(IRelay* openHotRelay, IRelay* openColdRelay)
+ThreeWayValve::ThreeWayValve(abstractions::actuators::IRelay* openHotRelay, abstractions::actuators::IRelay* openColdRelay)
 {
     this->openHotRelay = openHotRelay;
     this->openColdRelay = openColdRelay;
@@ -42,4 +41,3 @@ void ThreeWayValve::moveToCold(){
 void ThreeWayValve::moveToCHot(){
 
 }
-#endif // !THREE_WAY_MIXER_H

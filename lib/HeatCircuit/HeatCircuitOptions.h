@@ -1,5 +1,4 @@
-#ifndef HEAT_CIRCUIT_COMPONENTS_OPTIONS_H
-#define HEAT_CIRCUIT_COMPONENTS_OPTIONS_H
+#pragma once
 
 class HeatCircuitComponentsOptions {
 public:
@@ -67,5 +66,3 @@ private:
     int pumpRelayPin;
     float targetTemperature;
 };
-
-#endif // HEAT_CIRCUIT_COMPONENTS_OPTIONS_H

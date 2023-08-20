@@ -1,11 +1,11 @@
 #ifndef NTPSYNCTIMELINE_H
 #define NTPSYNCTIMELINE_H
 
-#include "ITimeline.h"
+#include <abstractions.hpp>
 #include <NTPClient.h>
 #include <Ethernet.h>
 
-class NTPSyncTimeline : public ITimeline
+class NTPSyncTimeline : public abstractions::time::ITimeline
 {
 private:
     NTPClient ntpClient;

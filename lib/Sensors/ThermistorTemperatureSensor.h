@@ -1,8 +1,7 @@
-#ifndef THERMISTOR_TEMPERATURE_SENSOR_H
-#define THERMISTOR_TEMPERATURE_SENSOR_H
+#pragma once
 
-#include "ITemperatureSensor.h"
 #include <Arduino.h>
+#include <abstractions.hpp>
 #include <Thermistor.h>
 
 /**
@@ -10,7 +9,7 @@
  * @brief The ThermistorTemperatureSensor class represents a temperature sensor using a thermistor.
  * It implements the ITemperatureSensor interface and provides temperature measurement methods.
  */
-class ThermistorTemperatureSensor : public ITemperatureSensor {
+class ThermistorTemperatureSensor : public abstractions::sensors::ITemperatureSensor {
 private:
     int thermistorPin; // Pin connected to the thermistor
     float temperatureCelsius;
@@ -55,4 +54,3 @@ Thermistor* thermistor;
 
 };
 
-#endif // !THERMISTOR_TEMPERATURE_SENSOR_H

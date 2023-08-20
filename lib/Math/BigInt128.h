@@ -1,5 +1,8 @@
-#ifndef BIGINT128_H
-#define BIGINT128_H
+#pragma once
+
+#include <cstdio>
+#include <cctype>
+#include <stdexcept>
 
 class BigInt128 {
 private:
@@ -17,8 +20,18 @@ public:
     BigInt128 operator/(const BigInt128& other) const;
     BigInt128 operator%(const BigInt128& other) const;
 
+    bool operator>=(const BigInt128& other) const;
+    bool operator<=(const BigInt128& other) const;
+    bool operator>(const BigInt128& other) const;
+    bool operator<(const BigInt128& other) const;
+
+
+    bool operator==(const BigInt128& other) const;
+    bool operator!=(const BigInt128& other) const { return !(*this == other); }
+
     // Convert to string for display
     char* to_string(char* buffer, unsigned int size) const;
+    BigInt128 parse(const char* str) const;
 };
 
 // BigInt128 implementation
@@ -81,6 +94,7 @@ BigInt128 BigInt128::operator/(const BigInt128& other) const {
     if (other == BigInt128(0)) {
         // Handle division by zero
         // Return a special value or throw an exception
+        throw std::invalid_argument("Division by zero");
     }
 
     BigInt128 quotient;
@@ -109,6 +123,39 @@ BigInt128 BigInt128::operator%(const BigInt128& other) const {
     return remainder;
 }
 
+bool BigInt128::operator==(const BigInt128& other) const {
+    return (high == other.high) && (low == other.low);
+}
+
+bool BigInt128::operator<(const BigInt128& other) const {
+    if (high < other.high) {
+        return true;
+    } else if (high > other.high) {
+        return false;
+    } else {
+        return low < other.low;
+    }
+}
+
+bool BigInt128::operator>(const BigInt128& other) const {
+    if (high > other.high) {
+        return true;
+    } else if (high < other.high) {
+        return false;
+    } else {
+        return low > other.low;
+    }
+}
+
+bool BigInt128::operator<=(const BigInt128& other) const {
+    return !(*this > other);
+}
+
+bool BigInt128::operator>=(const BigInt128& other) const {
+    return !(*this < other);
+}
+
+
 char* BigInt128::to_string(char* buffer, unsigned int size) const {
     const unsigned int buffer_size = 33; // 32 hex digits + null terminator
     if (size < buffer_size) {
@@ -130,4 +177,44 @@ char* BigInt128::to_string(char* buffer, unsigned int size) const {
     return buffer;
 }
 
-#endif // BIGINT128_H
+
+BigInt128 BigInt128::parse(const char* str) const {
+        if (!str) {
+            throw std::invalid_argument("Input string is null");
+        }
+
+        // Skip leading whitespace
+        while (*str && std::isspace(*str)) {
+            ++str;
+        }
+
+        // Handle hexadecimal "0x" prefix if present
+        if (*str == '0' && (*(str + 1) == 'x' || *(str + 1) == 'X')) {
+            str += 2;
+        }
+
+        // Parse hexadecimal digits
+        unsigned long long high = 0;
+        unsigned long long low = 0;
+        int digitCount = 0;
+
+        while (*str) {
+            char c = *str;
+            if (std::isxdigit(c)) {
+                unsigned int digit = std::isdigit(c) ? (c - '0') : (std::toupper(c) - 'A' + 10);
+                if (digitCount < 16) {
+                    low = (low << 4) | digit;
+                } else if (digitCount < 32) {
+                    high = (high << 4) | digit;
+                } else {
+                    break; // Ignore additional digits
+                }
+                ++digitCount;
+            } else {
+                break; // Stop parsing at non-hexadecimal character
+            }
+            ++str;
+        }
+
+        return BigInt128(high, low);
+    }

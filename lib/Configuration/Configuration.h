@@ -1,13 +1,15 @@
+#pragma once
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <regex>
+// #include <ArduinoJson.h>
+#include <abstractions.hpp>
 
-#include "IConfiguration.h"
-
-class Configuration : public IConfiguration
+class Configuration : public abstractions::configuration::IConfiguration
 {
 private:
     std::map<std::string, std::string> configMap;
@@ -79,9 +81,9 @@ public:
         return matchingKeys;
     }
 
-    IConfiguration *getSection(const std::string &path) override
+    abstractions::configuration::IConfiguration *getSection(const std::string &path) override
     {
-        IConfiguration *sectionConfig = new Configuration();
+        abstractions::configuration::IConfiguration *sectionConfig = new Configuration();
 
         std::string regexPattern = path + "\\..*";
         std::regex pattern(regexPattern);
@@ -101,28 +103,29 @@ public:
         return sectionConfig;
     }
 
-    void loadFromJson(const char* jsonString) {
-    // StaticJsonDocument<256> jsonDoc;
-    // deserializeJson(jsonDoc, jsonString);
+    void loadFromJson(const char *jsonString)
+    {
+        // StaticJsonDocument<256> jsonDoc;
+        // deserializeJson(jsonDoc, jsonString);
 
-    // for (const JsonPair& kvp : jsonDoc.as<JsonObject>()) {
+        // for (const JsonPair &kvp : jsonDoc.as<JsonObject>())
+        // {
 
-    //     // configMap[std::string(kvp.key().c_str())] = std::string(kvp.value().as<char*>());
-
-    // }
-}
+        //     configMap[std::string(kvp.key().c_str())] = kvp.value().as<std::string>();
+        // }
+    }
 };
 
 int main()
 {
-    IConfiguration *config = new Configuration();
+    abstractions::configuration::IConfiguration *config = new Configuration();
 
     // Access and print values from the configuration
     std::cout << "Name: " << config->getValue("name") << std::endl;
     std::cout << "City: " << config->getValue("location.city") << std::endl;
     std::cout << "Country: " << config->getValue("location.country") << std::endl;
 
-    IConfiguration *section = config->getSection("location");
+    abstractions::configuration::IConfiguration *section = config->getSection("location");
     std::cout << "City: " << section->getValue("city") << std::endl;
     std::cout << "Country: " << section->getValue("country") << std::endl;
 

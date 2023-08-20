@@ -1,20 +1,19 @@
-#ifndef SINGLE_RELAY_H
-#define SINGLE_RELAY_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoLog.h>
-#include "IRelay.h"
+#include <abstractions.hpp>
 
 /**
  * @class SingleRelay
  * @brief Represents a single relay device.
  *        This class implements the IRelay interface and provides methods for controlling and querying the state of the relay.
  */
-class SingleRelay : public IRelay {
+class SingleRelay : public abstractions::actuators::IRelay {
 private:
     int pin;                 ///< The pin number connected to the relay.
-    RelayState normalState;  ///< The normal state (open or closed) of the relay.
-    RelayState currentState; ///< The current state (open or closed) of the relay.
+    abstractions::actuators::RelayState normalState;  ///< The normal state (open or closed) of the relay.
+    abstractions::actuators::RelayState currentState; ///< The current state (open or closed) of the relay.
 
 public:
     /**
@@ -28,7 +27,7 @@ public:
      * @param relayPin The pin number connected to the relay.
      * @param defaultNormalState The default normal state of the relay (open or closed).
      */
-    SingleRelay(int relayPin, RelayState defaultNormalState = RelayState::CLOSED);
+    SingleRelay(int relayPin, abstractions::actuators::RelayState defaultNormalState = abstractions::actuators::RelayState::CLOSED);
 
     // Methods to control the relay
 
@@ -56,13 +55,13 @@ public:
      * @brief Get the current state of the relay.
      * @return The current state of the relay (open or closed).
      */
-    RelayState getState() const override;
+    abstractions::actuators::RelayState getState() const override;
 
     /**
      * @brief Get the normal state of the relay.
      * @return The normal state of the relay (open or closed).
      */
-    RelayState getNormalState() const override;
+    abstractions::actuators::RelayState getNormalState() const override;
 
     /**
      * @brief Check if the relay is in its normal state.
@@ -89,7 +88,7 @@ private:
      * @brief Set the relay state.
      * @param newState The new state to set (open or closed).
      */
-    void setRelayState(RelayState newState);
+    void setRelayState(abstractions::actuators::RelayState newState);
 };
 
-#endif // !SINGLE_RELAY_H
+

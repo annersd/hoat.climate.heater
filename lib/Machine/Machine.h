@@ -1,40 +1,36 @@
-#ifndef MACHINE_H
-#define MACHINE_H
-
+#pragma once
 
 #include <Arduino.h>    // Include the Arduino library
 #include <ArduinoLog.h> // Include the ArduinoLog library
+#include "abstractions.hpp"
 
-#include "IComponent.h"                  // Include the IComponent interface
 #include "HeatCircuit.h"                 // Include the HeatCircuit class
 #include "Thermistor.h"                  // Include the Thermistor class
 #include "ThermistorTemperatureSensor.h" // Include the ThermistorTemperatureSensor class
 #include "ThreeWayValve.h"               // Include the ThreeWayValve class
-#include "ITemperatureSensor.h"          // Include the ITemperatureSensor interface
 #include "SingleRelay.h"                 // Include the SingleRelay class
 #include "HeatCircuitOptions.h"          // Include the HeatCircuitComponentsOptions class
-#include "ITimeLine.h"                   // Include the ITimeLine interface
-#include "IConfiguration.h"              // Include the IConfiguration interface
 #include "Configuration.h"               // Include the Configuration class
 
 #include <iostream>
 #include <string>
 
-class Machine : public IComponent
+class Machine : public abstractions::components::IComponent
 {
 private:
+    Logging *logger;
     bool isRunning;
 
     HeatCircuit *hcFloor;
     HeatCircuit *hcHeater;
-    ITemperatureSensor *hsOutside;
+    abstractions::sensors::ITemperatureSensor *hsOutside;
 
     HeatCircuitComponentsOptions optionsFloor;
     HeatCircuitComponentsOptions optionsHeater;
 
-    ITimeline *timeline;
+    abstractions::time::ITimeline *timeline;
 
-    HeatCircuit *constructHeatingCircuit(IConfiguration *section)
+    HeatCircuit *constructHeatingCircuit(abstractions::configuration::IConfiguration *section)
     {
         HeatCircuitComponentsOptions options(
             atoi(section->getValue("thermistorPin").c_str()),
@@ -50,19 +46,23 @@ private:
             new SingleRelay(options.getHotRelayPin()),
             new SingleRelay(options.getColdRelayPin()));
 
-        IRelay *waterPump = new SingleRelay(options.getPumpRelayPin());
+        abstractions::actuators::IRelay *waterPump = new SingleRelay(options.getPumpRelayPin());
 
         return new HeatCircuit(ts, &threeWayValve, waterPump, options.getTargetTemperature());
     }
 
 public:
-    Machine() : isRunning(false)
+    abstractions::configuration::IConfiguration *Config = new Configuration();
+
+    Machine(ServiceCollection *services) : isRunning(false)
     {
         // Constructor initialization
+        logger = services->getService<Logging>();
     }
 
     void update() override
     {
+        logger->noticeln("Updating machine...");
         // Update the machine's state or perform periodic tasks
 
         timeline->update();
@@ -81,16 +81,18 @@ public:
 
     void initialize()
     {
+        logger->noticeln("Initializing machine...");
+
         // Perform machine initialization tasks here
         timeline->initialize();
 
         // Get the section for heating.circuit.floor
-        IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
+        abstractions::configuration::IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
         hcFloor = constructHeatingCircuit(floorSection);
         delete floorSection;
 
         // Get the section for heating.circuit.heater
-        IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
+        abstractions::configuration::IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
         hcHeater = constructHeatingCircuit(heaterSection);
         delete heaterSection;
 
@@ -117,8 +119,4 @@ public:
     {
         return isRunning;
     }
-
-    IConfiguration *Config = new Configuration();
 };
-
-#endif // MACHINE_H

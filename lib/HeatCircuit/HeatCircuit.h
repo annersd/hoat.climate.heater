@@ -1,19 +1,17 @@
-#ifndef HEAT_CIRCUIT_H
-#define HEAT_CIRCUIT_H
+#pragma once
 
 #include <Arduino.h>
+#include <abstractions.hpp>
 #include "ThreeWayValve.h"
-#include "ITemperatureSensor.h"
-#include "IComponent.h"
-#include "IRelay.h"
 
-class HeatCircuit : public IComponent
+
+class HeatCircuit : public abstractions::components::IComponent
 {
 private:
-  ITemperatureSensor *temperatureSensor;
+  abstractions::sensors::ITemperatureSensor *temperatureSensor;
   float targetTemperature; 
   ThreeWayValve *threeWayValve;
-  IRelay *waterPump;
+  abstractions::actuators::IRelay *waterPump;
 
   float hysteresis; // Private member for hysteresis value
 
@@ -29,7 +27,7 @@ private:
   }
 
 public:
-  HeatCircuit(ITemperatureSensor *hcTemeraturSensor, ThreeWayValve *threeWayValve, IRelay *waterPump, float targetTemp)
+  HeatCircuit(abstractions::sensors::ITemperatureSensor *hcTemeraturSensor, ThreeWayValve *threeWayValve, abstractions::actuators::IRelay *waterPump, float targetTemp)
       : temperatureSensor(hcTemeraturSensor),
         targetTemperature(targetTemp),
         threeWayValve(threeWayValve),
@@ -77,6 +75,9 @@ public:
   void initialize() override
   {
     waterPump->close();
+
+    // move the valve to cold to ensure the valve is in a known state
+    threeWayValve->moveToCold();
   }
 
   void update() override
@@ -96,5 +97,3 @@ public:
     hysteresis = value;
   }
 };
-
-#endif // !HEAT_CIRCUIT_H

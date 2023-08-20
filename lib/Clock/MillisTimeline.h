@@ -1,9 +1,8 @@
-#ifndef MILLISTIMELINE_H
-#define MILLISTIMELINE_H
+#pragma once
 
-#include "ITimeline.h"
+#include <abstractions.hpp>
 
-class MillisTimeline : public ITimeline
+class MillisTimeline : public abstractions::time::ITimeline
 {
 private:
     unsigned long long initialMillis;
