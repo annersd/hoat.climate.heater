@@ -2,7 +2,7 @@
 
 #include <Arduino.h>    // Include the Arduino library
 #include <ArduinoLog.h> // Include the ArduinoLog library
-#include "abstractions.hpp"
+#include "cobold.hpp"
 
 #include "HeatCircuit.h"                 // Include the HeatCircuit class
 #include "Thermistor.h"                  // Include the Thermistor class
@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-class Machine : public abstractions::components::IComponent
+class Machine : public cobold::components::IComponent
 {
 private:
     Logging *logger;
@@ -23,14 +23,14 @@ private:
 
     HeatCircuit *hcFloor;
     HeatCircuit *hcHeater;
-    abstractions::sensors::ITemperatureSensor *hsOutside;
+    cobold::sensors::ITemperatureSensor *hsOutside;
 
     HeatCircuitComponentsOptions optionsFloor;
     HeatCircuitComponentsOptions optionsHeater;
 
-    abstractions::time::ITimeline *timeline;
+    cobold::time::ITimeline *timeline;
 
-    HeatCircuit *constructHeatingCircuit(abstractions::configuration::IConfiguration *section)
+    HeatCircuit *constructHeatingCircuit(cobold::configuration::IConfiguration *section)
     {
         HeatCircuitComponentsOptions options(
             atoi(section->getValue("thermistorPin").c_str()),
@@ -46,13 +46,13 @@ private:
             new SingleRelay(options.getHotRelayPin()),
             new SingleRelay(options.getColdRelayPin()));
 
-        abstractions::actuators::IRelay *waterPump = new SingleRelay(options.getPumpRelayPin());
+        cobold::actuators::IRelay *waterPump = new SingleRelay(options.getPumpRelayPin());
 
         return new HeatCircuit(ts, &threeWayValve, waterPump, options.getTargetTemperature());
     }
 
 public:
-    abstractions::configuration::IConfiguration *Config = new Configuration();
+    cobold::configuration::IConfiguration *Config = new Configuration();
 
     Machine(ServiceCollection *services) : isRunning(false)
     {
@@ -87,12 +87,12 @@ public:
         timeline->initialize();
 
         // Get the section for heating.circuit.floor
-        abstractions::configuration::IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
+        cobold::configuration::IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
         hcFloor = constructHeatingCircuit(floorSection);
         delete floorSection;
 
         // Get the section for heating.circuit.heater
-        abstractions::configuration::IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
+        cobold::configuration::IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
         hcHeater = constructHeatingCircuit(heaterSection);
         delete heaterSection;
 

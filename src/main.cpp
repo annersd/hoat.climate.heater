@@ -1,16 +1,22 @@
-#include <abstractions.hpp>
+#include <cobold.hpp>
 #include <Machine.h>
 #include "Host.h" // Include the Host class
+#include "IHostBuilder.h"
+#include "HostBuilder.h"
+
+
+IHost *host; // Declare a pointer to the Host class
+Logging *logger;
 
 void setup()
 {
   
   Serial.begin(115200); // Initialize default serial communication at 115200 baud
 
-  Host host; // Create an instance of the Host class
+  IHostBuilder *hostBuilder = new HostBuilder() ; // Create an instance of the Host class
 
-  host.configureAppConfiguration(
-      [](abstractions::configuration::IConfiguration *config) -> void
+  hostBuilder->configureAppConfiguration(
+      [](cobold::configuration::IConfiguration *config) -> void
       {
         // configure device
         config->setValue("device.name", "Heating Controller");
@@ -37,42 +43,27 @@ void setup()
         config->setValue("heating.circuit.outside.thermistor.pin", "2");
       });
 
-  host.configureServices(
+  hostBuilder->configureServices(
       [](ServiceCollection *services) -> void
       {
-        services->addService<Machine>();
+          services->addService<Machine>([](ServiceCollection *services) -> void * { return new Machine(services); });
       });
 
-  host.build();
-  host.run();
+  host = hostBuilder->build();
 
+  logger = host->getServices()->getService<Logging>();
 
   logger->infoln("Starting up...");
-
-  serviceCollection
-      .addServiceWithConstructor<Machine>([](ServiceCollection *services) -> void *
-                                          { return new Machine(services); });
-
-  Machine *machine = serviceCollection.getService<Machine>();
-
-  machine->initialize();
-  machine->start();
-
-  logger->infoln("Startup complete");
-
-  MessageBus *messageBus = serviceCollection.getService<MessageBus>();
-  messageBus->createMessageProcessingTask();
+  host->start();
 }
 
 void loop()
 {
-  Logging *logger = serviceCollection.getService<Logging>();
-
   logger->noticeln("Looping...");
 
-  Machine *machine = serviceCollection.getService<Machine>();
+  // Machine *machine = serviceCollection.getService<Machine>();
 
-  machine->update();
+  // machine->update();
 
   delay(100);
   logger->noticeln("Loop complete");
