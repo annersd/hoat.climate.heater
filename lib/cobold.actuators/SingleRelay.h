@@ -16,18 +16,13 @@ private:
     cobold::actuators::RelayState currentState; ///< The current state (open or closed) of the relay.
 
 public:
-    /**
-     * @brief Default constructor.
-     *        Creates a SingleRelay object with default values.
-     */
-    SingleRelay();
 
     /**
      * @brief Constructor with pin and default normal state.
      * @param relayPin The pin number connected to the relay.
      * @param defaultNormalState The default normal state of the relay (open or closed).
      */
-    SingleRelay(int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
+    SingleRelay(ServiceCollection* services, int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
 
     // Methods to control the relay
 
@@ -89,6 +84,9 @@ private:
      * @param newState The new state to set (open or closed).
      */
     void setRelayState(cobold::actuators::RelayState newState);
+
+    Logging *logger;
+    ServiceCollection* services;
 };
 
 

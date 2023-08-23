@@ -1,9 +1,13 @@
 #include "SingleRelay.h"
 
-SingleRelay::SingleRelay() : pin(0), normalState(cobold::actuators::RelayState::CLOSED), currentState(cobold::actuators::RelayState::CLOSED) {}
 
-SingleRelay::SingleRelay(int relayPin, cobold::actuators::RelayState defaultNormalState)
+
+SingleRelay::SingleRelay(ServiceCollection* services, int relayPin, cobold::actuators::RelayState defaultNormalState)
     : pin(relayPin), normalState(defaultNormalState), currentState(defaultNormalState) {
+
+       this->services = services;
+       logger = services->getService<Logging>();  
+
     pinMode(pin, OUTPUT);
     setRelayState(currentState);
 }
