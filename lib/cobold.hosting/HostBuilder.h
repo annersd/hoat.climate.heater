@@ -2,6 +2,7 @@
 
 #include <Arduino.h>    // Include the Arduino library
 #include <ArduinoLog.h> // Include the ArduinoLog library
+
 #include "cobold.hpp"
 #include "Configuration.h"
 #include "IHostBuilder.h"
@@ -25,7 +26,11 @@ public:
 
 HostBuilder::HostBuilder(/* args */)
 {
-    serviceCollection = new ServiceCollection();
+    Serial.begin(115200);
+    // Initialize with log level and log output.
+    Log.begin(LOG_LEVEL_VERBOSE, &Serial);
+    
+    serviceCollection = new ServiceCollection(&Log);
     configuration = new Configuration();
 }
 
@@ -51,16 +56,16 @@ IHostBuilder *HostBuilder::configureServices(std::function<void(ServiceCollectio
 
 IHost *HostBuilder::build()
 {
-    Serial.begin(115200);
+    
 
     serviceCollection->addService<Logging>([](ServiceCollection *services) -> void * {
-        // Initialize with log level and log output.
-        Log.begin(LOG_LEVEL_VERBOSE, &Serial);
+        
         return &Log;
     });
 
-    serviceCollection->addService<cobold::configuration::IConfiguration>(configuration);
+    Log.verbose("HostBuilder::build() - Building Services Collection...");
 
+    serviceCollection->addService<cobold::configuration::IConfiguration>(configuration);
     serviceCollection->addService<MessageBus>();
 
     for (auto configLambda : configurationLambdas)
@@ -74,7 +79,11 @@ IHost *HostBuilder::build()
     }
 
     Logging *logger = serviceCollection->getService<Logging>();
-    logger->infoln("Starting up...");
+    logger->verboseln("HostBuilder::build() - Services Collection built...");
 
-    return new Host(serviceCollection);
+    logger->verboseln("HostBuilder::build() - Creating Host...");
+    auto host = new Host(serviceCollection);
+    logger->verboseln("HostBuilder::build() - Host created...");
+
+    return host;
 }

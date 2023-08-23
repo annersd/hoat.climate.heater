@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 
-class Machine : public cobold::components::IComponent
+class Machine : public cobold::components::IComponent, public cobold::hosting::IHostedService
 {
 private:
     Logging *logger;
@@ -65,16 +65,16 @@ public:
         logger->noticeln("Updating machine...");
         // Update the machine's state or perform periodic tasks
 
-        timeline->update();
+        // timeline->update();
 
-        // Update the heating circuits
-        float tempOutside = hsOutside->getTemperatureCelsius();
+        // // Update the heating circuits
+        // float tempOutside = hsOutside->getTemperatureCelsius();
 
-        hcFloor->setOutsideTemperatue(tempOutside);
-        hcFloor->update();
+        // hcFloor->setOutsideTemperatue(tempOutside);
+        // hcFloor->update();
 
-        hcHeater->setOutsideTemperatue(tempOutside);
-        hcHeater->update();
+        // hcHeater->setOutsideTemperatue(tempOutside);
+        // hcHeater->update();
 
         // vTaskDelay(1000 );
     }
@@ -102,15 +102,15 @@ public:
             new Thermistor(THERMISTOR_PIN_3, false, 10000, 10000, 30, 3950, 5));
     }
 
-    void start()
+    void start() override
     {
         isRunning = true;
 
-        hcFloor->initialize();
-        hcHeater->initialize();
+        // hcFloor->initialize();
+        // hcHeater->initialize();
     }
 
-    void stop()
+    void stop() override
     {
         isRunning = false;
     }

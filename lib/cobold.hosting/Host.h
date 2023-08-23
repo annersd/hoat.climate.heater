@@ -12,6 +12,7 @@ class Host : public IHost
 private:
     /* data */
     ServiceCollection *serviceCollection;
+    Logging *logger;
 public:
     explicit Host(ServiceCollection *serviceCollection);
     ~Host();
@@ -23,6 +24,7 @@ public:
 Host::Host(ServiceCollection *serviceCollection)
 {
     this->serviceCollection = serviceCollection;
+    logger = serviceCollection->getService<Logging>();
 }
 
 Host::~Host()
@@ -31,19 +33,22 @@ Host::~Host()
 
 void Host::start()
 {
+    logger->verboseln("Host::start()");
     //get all the services that implement IHostedService
-    auto hostedServices = serviceCollection->getServicesInheritingFromInterface<IHostedService*>();
+    auto hostedServices = serviceCollection->getServicesInheritingFromInterface();
     
     for (auto hostedService : hostedServices)
     {
+        logger->verboseln("Host::start() - starting hosted service");
         hostedService->start();
     }
+    logger->verboseln("Host::start() - done");
 }
 
 void Host::stop()
 {
     //get all the services that implement IHostedService
-    auto hostedServices = serviceCollection->getServicesInheritingFromInterface<IHostedService*>();
+    auto hostedServices = serviceCollection->getServicesInheritingFromInterface();
     
     for (auto hostedService : hostedServices)
     {

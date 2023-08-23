@@ -4,67 +4,83 @@
 #include "IHostBuilder.h"
 #include "HostBuilder.h"
 
-
 IHost *host; // Declare a pointer to the Host class
 Logging *logger;
 
 void setup()
 {
-  
   Serial.begin(115200); // Initialize default serial communication at 115200 baud
+  Serial.println("Starting setup...");
 
-  IHostBuilder *hostBuilder = new HostBuilder() ; // Create an instance of the Host class
+  try
+  {
 
-  hostBuilder->configureAppConfiguration(
-      [](cobold::configuration::IConfiguration *config) -> void
-      {
-        // configure device
-        config->setValue("device.name", "Heating Controller");
+    IHostBuilder *hostBuilder = new HostBuilder(); // Create an instance of the Host class
 
-        // configure floor heating circuits
-        config->setValue("heating.circuit.floor.enabled", "true");
-        config->setValue("heating.circuit.floor.name", "Floor");
-        config->setValue("heating.circuit.floor.thermistorPin", "0");
-        config->setValue("heating.circuit.floor.hotRelayPin", "5");
-        config->setValue("heating.circuit.floor.coldRelayPin", "6");
-        config->setValue("heating.circuit.floor.pumpRelayPin", "3");
-        config->setValue("heating.circuit.floor.targetTemperature", "21.0");
+    hostBuilder->configureAppConfiguration(
+        [](cobold::configuration::IConfiguration *config) -> void
+        {
+          // configure device
+          config->setValue("device.name", "Heating Controller");
 
-        // configure heater heating circuits
-        config->setValue("heating.circuit.heater.enabled", "true");
-        config->setValue("heating.circuit.heater.name", "Heater");
-        config->setValue("heating.circuit.heater.thermistorPin", "1");
-        config->setValue("heating.circuit.heater.hotRelayPin", "5");
-        config->setValue("heating.circuit.heater.coldRelayPin", "6");
-        config->setValue("heating.circuit.heater.pumpRelayPin", "4");
-        config->setValue("heating.circuit.heater.targetTemperature", "21.0");
+          // configure floor heating circuits
+          config->setValue("heating.circuit.floor.enabled", "true");
+          config->setValue("heating.circuit.floor.name", "Floor");
+          config->setValue("heating.circuit.floor.thermistorPin", "0");
+          config->setValue("heating.circuit.floor.hotRelayPin", "5");
+          config->setValue("heating.circuit.floor.coldRelayPin", "6");
+          config->setValue("heating.circuit.floor.pumpRelayPin", "3");
+          config->setValue("heating.circuit.floor.targetTemperature", "21.0");
 
-        // configure thermistor for outside tmeperatue
-        config->setValue("heating.circuit.outside.thermistor.pin", "2");
-      });
+          // configure heater heating circuits
+          config->setValue("heating.circuit.heater.enabled", "true");
+          config->setValue("heating.circuit.heater.name", "Heater");
+          config->setValue("heating.circuit.heater.thermistorPin", "1");
+          config->setValue("heating.circuit.heater.hotRelayPin", "5");
+          config->setValue("heating.circuit.heater.coldRelayPin", "6");
+          config->setValue("heating.circuit.heater.pumpRelayPin", "4");
+          config->setValue("heating.circuit.heater.targetTemperature", "21.0");
 
-  hostBuilder->configureServices(
-      [](ServiceCollection *services) -> void
-      {
-          services->addService<Machine>([](ServiceCollection *services) -> void * { return new Machine(services); });
-      });
+          // configure thermistor for outside tmeperatue
+          config->setValue("heating.circuit.outside.thermistor.pin", "2");
+        });
 
-  host = hostBuilder->build();
+    hostBuilder->configureServices(
+        [](ServiceCollection *services) -> void
+        {
+          services->addService<Machine>([](ServiceCollection *services) -> void *
+                                        { return new Machine(services); });
+        });
 
-  logger = host->getServices()->getService<Logging>();
+    host = hostBuilder->build();
 
-  logger->infoln("Starting up...");
-  host->start();
+    logger = host->getServices()->getService<Logging>();
+
+    host->start();
+  }
+  catch (const std::exception &e)
+  {
+    Serial.println("Exception caught");
+    Serial.println(e.what());
+  }
 }
 
 void loop()
 {
-  logger->noticeln("Looping...");
+  try
+  {
+    logger->noticeln("Looping...");
 
-  // Machine *machine = serviceCollection.getService<Machine>();
+    Machine *machine = host->getServices()->getService<Machine>();
+    machine->update();
+    
 
-  // machine->update();
-
-  delay(100);
-  logger->noticeln("Loop complete");
+    delay(1000);
+    logger->noticeln("Loop complete");
+  }
+  catch (const std::exception &e)
+  {
+    Serial.println("Exception caught");
+    Serial.println(e.what());
+  }
 }

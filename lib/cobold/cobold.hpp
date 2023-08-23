@@ -1,5 +1,7 @@
 #pragma once
 
+
+
 #include "IComponent.h"
 
 // Include Actuators
@@ -21,6 +23,7 @@
 // Include Service Collection
 #include "TypeWrapper.h"
 #include "ServiceCollection.h"
+#include "IHostedService.h"
 
 // Include Messages Bus and Messages
 #include "Message.h"

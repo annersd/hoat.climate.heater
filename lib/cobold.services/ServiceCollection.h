@@ -1,4 +1,6 @@
 #pragma once
+#include <Arduino.h>    // Include the Arduino library
+#include <ArduinoLog.h> // Include the ArduinoLog library
 
 #include "cobold.hpp"
 #include <map>
@@ -13,6 +15,14 @@
 class ServiceCollection
 {
 public:
+    ServiceCollection(Logging *logger)
+    {
+        this->logger = logger;
+        logger->verboseln("ServiceCollection constructor");
+        services = {};
+        constructorMap = {};
+    }
+
     /**
      * @brief Add a service to the collection without a constructor.
      *
@@ -66,12 +76,48 @@ public:
     T *getService()
     {
         ITypeWrapper *typeWrapper = new TypeWrapper<T>();
-        auto it = services.find(typeWrapper);
-        if (it != services.end())
+        std::string typeName = typeWrapper->GetTypeName();
+
+        logger->verboseln("Looking for service: %s", String(typeName.c_str()));
+
+        // Check in the services map
+        logger->verboseln("Checking services map");
+        auto it = services.begin();
+        while (it != services.end())
         {
-            void *servicePtr = it->second();
-            return reinterpret_cast<T *>(servicePtr);
+            logger->verboseln("Checking service: %s", it->first->GetTypeName().c_str());
+            ITypeWrapper *wrapper = it->first;
+
+            if (wrapper->GetTypeName() == typeName)
+            {
+                logger->verboseln("Service found");
+                void *servicePtr = it->second();
+                delete typeWrapper; // Clean up typeWrapper
+                return reinterpret_cast<T *>(servicePtr);
+            }
+            ++it;
         }
+
+        // Check in the constructorMap
+        logger->verboseln("Checking constructorMap");
+        auto constructorIt = constructorMap.begin();
+        while (constructorIt != constructorMap.end())
+        {
+            ITypeWrapper *wrapper = constructorIt->first;
+            if (wrapper->GetTypeName() == typeName)
+            {
+                logger->verboseln("Service found, creating new instance");
+                void *newService = constructorIt->second(this);
+                services[typeWrapper] = [newService]() -> void *
+                { return newService; };
+                // delete typeWrapper; // Do not delete beacause we use it in the services map
+                return reinterpret_cast<T *>(newService);
+            }
+            ++constructorIt;
+        }
+
+        delete typeWrapper; // Clean up typeWrapper
+        logger->verboseln("Service not found and no constructor available");
         return nullptr;
     }
 
@@ -82,26 +128,78 @@ public:
         static constexpr bool value = std::is_base_of<Base, Derived>::value;
     };
 
-    // get a list of services that inherit from the specified interface IHosedService*
-template <typename T >
-std::vector<T> getServicesInheritingFromInterface()
-{
-    std::vector<T> servicesList;
-    // for (auto it = services.begin(); it != services.end(); ++it)
-    // {
-    //     ITypeWrapper *typeWrapper = it->first;
-    //     if (is_derived<T, TInterface>::value && typeid(*typeWrapper) == typeid(TypeWrapper<T>))
-    //     {
-    //         void *servicePtr = it->second();
-    //         T service = dynamic_cast<T>(reinterpret_cast<TInterface>(servicePtr));
-    //         if (service)
-    //         {
-    //             servicesList.push_back(service);
-    //         }
-    //     }
-    // }
-    return servicesList;
-}
+    /**
+     * @brief Get a list of services that inherit from the specified interface.
+     *
+     * @tparam TInterface The interface type to check for.
+     * @return A vector of services that inherit from the specified interface.
+     */
+
+    std::vector<cobold::hosting::IHostedService *> getServicesInheritingFromInterface()
+    {
+        std::vector<cobold::hosting::IHostedService *> servicesList;
+
+        // Check the existing services map
+        for (auto it = services.begin(); it != services.end(); ++it)
+        {
+            ITypeWrapper *typeWrapper = it->first;
+
+            if (typeWrapper->isHostedService())
+            {
+                logger->verboseln("Service found");
+                void *servicePtr = it->second();
+                cobold::hosting::IHostedService *service = reinterpret_cast<cobold::hosting::IHostedService *>(servicePtr);
+                if (service)
+                {
+                    servicesList.push_back(service);
+                }
+            }
+        }
+
+        // Check the constructorMap for new services
+        for (auto constructorIt = constructorMap.begin(); constructorIt != constructorMap.end(); ++constructorIt)
+        {
+            ITypeWrapper *typeWrapper = constructorIt->first;
+
+            // Compare wrapped type with TInterface using is_base_of and typeid
+            if (typeWrapper->isHostedService())
+            {
+                // if not already in the services map
+                bool isAlreadyInServicesMap = false;
+                for (auto it = services.begin(); it != services.end(); ++it)
+                {
+                    ITypeWrapper *srvTypeWrapper = it->first;
+
+                    if (srvTypeWrapper->GetName() == typeWrapper->GetName())
+                    {
+                        isAlreadyInServicesMap = true;
+                        break;
+                    }
+                }
+
+                if (isAlreadyInServicesMap)
+                {
+                    continue;
+                }
+                else
+                {
+                    logger->verboseln("Service found, creating new instance");
+                    void *newService = constructorIt->second(this);
+                    services[typeWrapper] = [newService]() -> void *
+                    { return newService; };
+
+                    cobold::hosting::IHostedService *service = reinterpret_cast<cobold::hosting::IHostedService *>(newService);
+                    if (service)
+                    {
+                        servicesList.push_back(service);
+                    }
+                }
+            }
+        }
+
+        return servicesList;
+    }
+
     /**
      * @brief Update a service in the collection using a new constructor.
      *
@@ -123,6 +221,7 @@ std::vector<T> getServicesInheritingFromInterface()
     }
 
 private:
-    std::map<ITypeWrapper *, std::function<void *()>> services;
-    std::map<ITypeWrapper *, std::function<void *(ServiceCollection *)>> constructorMap;
+    std::map<ITypeWrapper *, std::function<void *()>> services = {};
+    std::map<ITypeWrapper *, std::function<void *(ServiceCollection *)>> constructorMap = {};
+    Logging *logger;
 };
