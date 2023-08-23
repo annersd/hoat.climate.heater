@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <regex>
-// #include <ArduinoJson.h>
+#include <ArduinoJson.h>
 #include <cobold.hpp>
 
 class Configuration : public cobold::configuration::IConfiguration
@@ -105,14 +105,14 @@ public:
 
     void loadFromJson(const char *jsonString)
     {
-        // StaticJsonDocument<256> jsonDoc;
-        // deserializeJson(jsonDoc, jsonString);
+        StaticJsonDocument<256> jsonDoc;
+        deserializeJson(jsonDoc, jsonString);
 
-        // for (const JsonPair &kvp : jsonDoc.as<JsonObject>())
-        // {
+        for (const JsonPair &kvp : jsonDoc.as<JsonObject>())
+        {
 
-        //     configMap[std::string(kvp.key().c_str())] = kvp.value().as<std::string>();
-        // }
+            configMap[std::string(kvp.key().c_str())] = kvp.value().as<std::string>();
+        }
     }
 };
 
