@@ -1,17 +1,20 @@
 
 #pragma once
 
-#include "../cobold.components/IComponent.h"
+#include "IComponent.h"
 
-namespace cobold {
+namespace cobold
+{
 
-    namespace actuators {
+    namespace actuators
+    {
         /**
          * @class IActuator
          * @brief The IActuator interface defines a contract for interacting with actuator devices.
          *        It provides a common set of methods for controlling and querying the state of actuator components.
          */
-        class IActuator : public cobold::components::IComponent {
+        class IActuator : public cobold::components::IComponent
+        {
         public:
             ~IActuator() override = default;
 

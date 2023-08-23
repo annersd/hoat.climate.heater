@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "IComponent.h"
 
 // Include Actuators

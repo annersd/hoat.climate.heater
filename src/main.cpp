@@ -1,10 +1,9 @@
 #include <cobold.hpp>
 #include <Machine.h>
 #include "Host.h" // Include the Host class
-#include "IHostBuilder.h"
 #include "HostBuilder.h"
 
-IHost *host; // Declare a pointer to the Host class
+cobold::hosting::IHost *host; // Declare a pointer to the Host class
 Logging *logger;
 
 void setup()
@@ -15,7 +14,7 @@ void setup()
   try
   {
 
-    IHostBuilder *hostBuilder = new HostBuilder(); // Create an instance of the Host class
+    cobold::hosting::IHostBuilder *hostBuilder = new cobold::hosting::HostBuilder(); // Create an instance of the Host class
 
     hostBuilder->configureAppConfiguration(
         [](cobold::configuration::IConfiguration *config) -> void

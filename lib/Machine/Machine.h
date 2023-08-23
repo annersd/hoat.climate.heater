@@ -42,7 +42,7 @@ private:
             atoi(section->getValue("pumpRelayPin").c_str()),
             atof(section->getValue("targetTemperature").c_str()));
 
-        ThermistorTemperatureSensor *ts = new ThermistorTemperatureSensor(
+        cobold::sensors::ThermistorTemperatureSensor *ts = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(options.getThermistorPin(), false, 10000, 10000, 30, 3950, 5));
 
         ThreeWayValve threeWayValve(
@@ -55,7 +55,7 @@ private:
     }
 
 public:
-    cobold::configuration::IConfiguration *Config = new Configuration();
+    cobold::configuration::IConfiguration *Config = new cobold::configuration::Configuration();
 
     Machine(ServiceCollection *services) : isRunning(false){
         // Constructor initialization
@@ -107,7 +107,7 @@ public:
         // Create outside temperature sensor
         logger->verboseln("Initializing outside temperature sensor...");
         int THERMISTOR_PIN_3 = atoi(Config->getValue("heating.circuit.outside.thermistor.pin").c_str());
-        hsOutside = new ThermistorTemperatureSensor(
+        hsOutside = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(THERMISTOR_PIN_3, false, 10000, 10000, 30, 3950, 5));
     }
 

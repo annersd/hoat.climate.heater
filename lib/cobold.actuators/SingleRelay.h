@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Arduino.h>
-#include <ArduinoLog.h>
 #include <cobold.hpp>
 
 /**
@@ -9,20 +7,61 @@
  * @brief Represents a single relay device.
  *        This class implements the IRelay interface and provides methods for controlling and querying the state of the relay.
  */
-class SingleRelay : public cobold::actuators::IRelay {
+class SingleRelay : public cobold::actuators::IRelay
+{
 private:
-    int pin;                 ///< The pin number connected to the relay.
-    cobold::actuators::RelayState normalState;  ///< The normal state (open or closed) of the relay.
+    /**
+     * @brief The pin number connected to the relay.
+     * This is the pin number of the Arduino board that is connected to the relay.
+     * The pin number is set during construction and cannot be changed afterwards.
+     */
+    int pin;
+
+    /**
+     * @brief The normal state of the relay (open or closed).
+     * This is the normal state of the relay, which is either open or closed.
+     * The normal state is set during construction and cannot be changed afterwards.
+     * The default normal state is closed.
+     * @see getNormalState()
+     * @see isNormalState()
+     */
+    cobold::actuators::RelayState normalState;
+
+    /**
+     * @brief The current state of the relay (open or closed).
+     * This is the current state of the relay, which is either open or closed
+     * The default current state is closed.
+     * @see getState()
+     * @see setRelayState()
+     *
+     */
     cobold::actuators::RelayState currentState; ///< The current state (open or closed) of the relay.
 
-public:
+    /**
+     * @brief A pointer to the service collection.
+     * The service collection is set during construction and cannot be changed afterwards.
+    */
+    ServiceCollection *services;
 
+    /**
+     * @brief Set the relay state.
+     * @param newState The new state to set (open or closed).
+     */
+    void setRelayState(cobold::actuators::RelayState newState);
+
+    /**
+     * @brief A pointer to the logger service.
+     * The logger service is set during construction and cannot be changed afterwards.
+     */
+    Logging *logger;
+
+public:
     /**
      * @brief Constructor with pin and default normal state.
      * @param relayPin The pin number connected to the relay.
      * @param defaultNormalState The default normal state of the relay (open or closed).
      */
-    SingleRelay(ServiceCollection* services, int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
+    SingleRelay(ServiceCollection *services, int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
 
     // Methods to control the relay
 
@@ -77,16 +116,4 @@ public:
      *        This method is called during system initialization to prepare the relay for operation.
      */
     void initialize() override;
-
-private:
-    /**
-     * @brief Set the relay state.
-     * @param newState The new state to set (open or closed).
-     */
-    void setRelayState(cobold::actuators::RelayState newState);
-
-    Logging *logger;
-    ServiceCollection* services;
 };
-
-
