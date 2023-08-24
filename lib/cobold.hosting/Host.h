@@ -4,6 +4,7 @@
 #include <ArduinoLog.h> // Include the ArduinoLog library
 #include "cobold.hpp"
 #include "Configuration.h"
+#include "HostingExtensions.h"
 
 namespace cobold
 {
@@ -39,7 +40,7 @@ namespace cobold
         {
             logger->verboseln("Host::start()");
             // get all the services that implement IHostedService
-            auto hostedServices = serviceCollection->getServicesInheritingFromInterface();
+            auto hostedServices = cobold::hosting::HostingExtensions::GetHostedServices(serviceCollection);
 
             for (auto hostedService : hostedServices)
             {
@@ -52,7 +53,7 @@ namespace cobold
         void Host::stop()
         {
             // get all the services that implement IHostedService
-            auto hostedServices = serviceCollection->getServicesInheritingFromInterface();
+            auto hostedServices = cobold::hosting::HostingExtensions::GetHostedServices(serviceCollection);
 
             for (auto hostedService : hostedServices)
             {

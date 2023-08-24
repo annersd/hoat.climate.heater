@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IHostedService.h"
 #include <string>
+#include <map>
 #include "ITypeWrapper.h"
 
 /**
@@ -12,6 +12,8 @@
 template <typename T>
 class TypeWrapper : public ITypeWrapper
 {
+    private:
+    std::map<std::string, std::string> properties;
 public:
     /**
      * @brief Get the mangled type name for the specified type.
@@ -56,8 +58,31 @@ public:
         return typeid(T);
     }
 
-    bool isHostedService() const override
+
+    /**
+     * @brief Get a property value by key.
+     *
+     * @param key The key of the property to retrieve.
+     * @return The value of the property, or an empty string if not found.
+     */
+    std::string GetProperty(const std::string &key) const override
     {
-        return std::is_base_of<cobold::hosting::IHostedService, T>::value;
+        auto it = properties.find(key);
+        if (it != properties.end())
+        {
+            return it->second;
+        }
+        return "";
+    }
+
+    /**
+     * @brief Set a property value by key.
+     *
+     * @param key The key of the property to set.
+     * @param value The value of the property.
+     */
+    void SetProperty(const std::string &key, const std::string &value) override
+    {
+        properties[key] = value;
     }
 };

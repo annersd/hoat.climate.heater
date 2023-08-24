@@ -1,7 +1,5 @@
 #pragma once
 
-#include "IHostedService.h"
-
 /**
  * @brief Interface for generating unique type IDs, type names, and accessing wrapped types.
  */
@@ -39,8 +37,8 @@ public:
     virtual const std::type_info& GetWrappedType() const = 0;
 
 
-    virtual bool    isHostedService()const = 0;
-
-
     virtual ~ITypeWrapper() {}
+
+    virtual std::string GetProperty(const std::string &key) const = 0;
+    virtual void SetProperty(const std::string &key, const std::string &value) = 0;
 };

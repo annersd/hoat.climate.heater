@@ -66,6 +66,16 @@ public:
         { return service; };
     }
 
+    void addExternalService(ITypeWrapper* typeWrapper, std::function<void *(ServiceCollection *)> constructor)
+    {
+        constructorMap[typeWrapper] = constructor;
+    }
+
+    void addExternalService(ITypeWrapper* typeWrapper, void* service)
+    {
+        services[typeWrapper] = [service]() -> void* { return service; };
+    }
+
     /**
      * @brief Get a service from the collection.
      *
@@ -128,77 +138,7 @@ public:
         static constexpr bool value = std::is_base_of<Base, Derived>::value;
     };
 
-    /**
-     * @brief Get a list of services that inherit from the specified interface.
-     *
-     * @tparam TInterface The interface type to check for.
-     * @return A vector of services that inherit from the specified interface.
-     */
-
-    std::vector<cobold::hosting::IHostedService *> getServicesInheritingFromInterface()
-    {
-        std::vector<cobold::hosting::IHostedService *> servicesList;
-
-        // Check the existing services map
-        for (auto it = services.begin(); it != services.end(); ++it)
-        {
-            ITypeWrapper *typeWrapper = it->first;
-
-            if (typeWrapper->isHostedService())
-            {
-                logger->verboseln("Service found");
-                void *servicePtr = it->second();
-                cobold::hosting::IHostedService *service = reinterpret_cast<cobold::hosting::IHostedService *>(servicePtr);
-                if (service)
-                {
-                    servicesList.push_back(service);
-                }
-            }
-        }
-
-        // Check the constructorMap for new services
-        for (auto constructorIt = constructorMap.begin(); constructorIt != constructorMap.end(); ++constructorIt)
-        {
-            ITypeWrapper *typeWrapper = constructorIt->first;
-
-            // Compare wrapped type with TInterface using is_base_of and typeid
-            if (typeWrapper->isHostedService())
-            {
-                // if not already in the services map
-                bool isAlreadyInServicesMap = false;
-                for (auto it = services.begin(); it != services.end(); ++it)
-                {
-                    ITypeWrapper *srvTypeWrapper = it->first;
-
-                    if (srvTypeWrapper->GetName() == typeWrapper->GetName())
-                    {
-                        isAlreadyInServicesMap = true;
-                        break;
-                    }
-                }
-
-                if (isAlreadyInServicesMap)
-                {
-                    continue;
-                }
-                else
-                {
-                    logger->verboseln("Service found, creating new instance");
-                    void *newService = constructorIt->second(this);
-                    services[typeWrapper] = [newService]() -> void *
-                    { return newService; };
-
-                    cobold::hosting::IHostedService *service = reinterpret_cast<cobold::hosting::IHostedService *>(newService);
-                    if (service)
-                    {
-                        servicesList.push_back(service);
-                    }
-                }
-            }
-        }
-
-        return servicesList;
-    }
+    
 
     /**
      * @brief Update a service in the collection using a new constructor.
@@ -220,8 +160,9 @@ public:
         }
     }
 
-private:
+    // ToDo fix bad design here (should be private)
     std::map<ITypeWrapper *, std::function<void *()>> services = {};
     std::map<ITypeWrapper *, std::function<void *(ServiceCollection *)>> constructorMap = {};
+    private:
     Logging *logger;
 };

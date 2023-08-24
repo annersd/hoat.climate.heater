@@ -2,6 +2,7 @@
 #include <Machine.h>
 #include "Host.h" // Include the Host class
 #include "HostBuilder.h"
+#include "HostingExtensions.h"
 
 cobold::hosting::IHost *host; // Declare a pointer to the Host class
 Logging *logger;
@@ -47,8 +48,8 @@ void setup()
     hostBuilder->configureServices(
         [](ServiceCollection *services) -> void
         {
-          services->addService<Machine>([](ServiceCollection *services) -> void *
-                                        { return new Machine(services); });
+          cobold::hosting::HostingExtensions::addHostedService<Machine>(services, [](ServiceCollection *services) -> void *
+                                                                        { return new Machine(services); });
         });
 
     host = hostBuilder->build();
