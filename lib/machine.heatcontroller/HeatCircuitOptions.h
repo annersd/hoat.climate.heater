@@ -1,68 +1,68 @@
 #pragma once
 
-class HeatCircuitComponentsOptions {
+#include "ThreeWayValveOptions.h"
+
+class HeatCircuitComponentsOptions
+{
 public:
-    HeatCircuitComponentsOptions(int thermistorPin, int hotRelayPin, int coldRelayPin, int pumpRelayPin, int targetTemperature )
+    HeatCircuitComponentsOptions(int thermistorPin, int pumpRelayPin, int targetTemperature, ThreeWayValveOptions threeWayValveOptions)
         : thermistorPin(thermistorPin),
-          hotRelayPin(hotRelayPin),
-          coldRelayPin(coldRelayPin),
           pumpRelayPin(pumpRelayPin),
-          targetTemperature(targetTemperature) {
+          targetTemperature(targetTemperature),
+          threeWayValveOptions(threeWayValveOptions)
+    {
     }
 
-    HeatCircuitComponentsOptions() {
+    HeatCircuitComponentsOptions()
+    {
         thermistorPin = -1;
-        hotRelayPin = -1;
-        coldRelayPin = -1;
         pumpRelayPin = -1;
         targetTemperature = 0.0;
-        
     }
 
-    int getThermistorPin() const {
+    int getThermistorPin() const
+    {
         return thermistorPin;
     }
 
-    void setThermistorPin(int pin) {
+    void setThermistorPin(int pin)
+    {
         thermistorPin = pin;
     }
 
-    int getHotRelayPin() const {
-        return hotRelayPin;
-    }
-
-    void setHotRelayPin(int pin) {
-        hotRelayPin = pin;
-    }
-
-    int getColdRelayPin() const {
-        return coldRelayPin;
-    }
-
-    void setColdRelayPin(int pin) {
-        coldRelayPin = pin;
-    }
-
-    int getPumpRelayPin() const {
+    int getPumpRelayPin() const
+    {
         return pumpRelayPin;
     }
 
-    void setPumpRelayPin(int pin) {
+    void setPumpRelayPin(int pin)
+    {
         pumpRelayPin = pin;
     }
 
-    void setTargetTemperature(float temp) {
+    void setTargetTemperature(float temp)
+    {
         targetTemperature = temp;
     }
 
-    float getTargetTemperature() const {
+    float getTargetTemperature() const
+    {
         return targetTemperature;
+    }
+
+    ThreeWayValveOptions getThreeWayValveOptions() const
+    {
+        return threeWayValveOptions;
+    }
+
+    void setThreeWayValveOptions(ThreeWayValveOptions options)
+    {
+        threeWayValveOptions = options;
     }
 
 private:
     int thermistorPin;
-    int hotRelayPin;
-    int coldRelayPin;
     int pumpRelayPin;
     float targetTemperature;
+    ThreeWayValveOptions threeWayValveOptions;
 };

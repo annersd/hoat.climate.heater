@@ -26,8 +26,8 @@ void setup()
           config->setValue("heating.circuit.floor.enabled", "true");
           config->setValue("heating.circuit.floor.name", "Floor");
           config->setValue("heating.circuit.floor.thermistorPin", "0");
-          config->setValue("heating.circuit.floor.hotRelayPin", "5");
-          config->setValue("heating.circuit.floor.coldRelayPin", "6");
+          config->setValue("heating.circuit.floor.valve.hotRelayPin", "5");
+          config->setValue("heating.circuit.floor.valve.coldRelayPin", "6");
           config->setValue("heating.circuit.floor.pumpRelayPin", "3");
           config->setValue("heating.circuit.floor.targetTemperature", "21.0");
 
@@ -35,8 +35,8 @@ void setup()
           config->setValue("heating.circuit.heater.enabled", "true");
           config->setValue("heating.circuit.heater.name", "Heater");
           config->setValue("heating.circuit.heater.thermistorPin", "1");
-          config->setValue("heating.circuit.heater.hotRelayPin", "5");
-          config->setValue("heating.circuit.heater.coldRelayPin", "6");
+          config->setValue("heating.circuit.heater.valve.hotRelayPin", "5");
+          config->setValue("heating.circuit.heater.valve.coldRelayPin", "6");
           config->setValue("heating.circuit.heater.pumpRelayPin", "4");
           config->setValue("heating.circuit.heater.targetTemperature", "21.0");
 

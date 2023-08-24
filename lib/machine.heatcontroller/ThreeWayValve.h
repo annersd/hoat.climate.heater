@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 #include <cobold.hpp>
+#include "SingleRelay.h"
+#include "ThreeWayValveOptions.h"
 
 /// @brief Controls a three-way valve
 class ThreeWayValve
@@ -11,18 +13,23 @@ private:
 cobold::actuators::IRelay* openHotRelay;
 cobold::actuators::IRelay* openColdRelay;
 
+ServiceCollection *services;
+Logging *logger;
+
 public:
-    ThreeWayValve(cobold::actuators::IRelay* openHotRelay, cobold::actuators::IRelay* openColdRelay);
+    ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions options);
     ~ThreeWayValve();
     void update();
     void moveToCold();
-    void moveToCHot();
+    void moveToHot();
 };
 
-ThreeWayValve::ThreeWayValve(cobold::actuators::IRelay* openHotRelay, cobold::actuators::IRelay* openColdRelay)
+ThreeWayValve::ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions options)
 {
-    this->openHotRelay = openHotRelay;
-    this->openColdRelay = openColdRelay;
+    this->services = services;
+    this->logger = services->getService<Logging>();
+    this->openHotRelay = new SingleRelay(services, options.getHotPin());
+    this->openColdRelay = new SingleRelay(services, options.getColdPin());
 }
 
 ThreeWayValve::~ThreeWayValve()
@@ -38,6 +45,6 @@ void ThreeWayValve::moveToCold(){
 
 }
 
-void ThreeWayValve::moveToCHot(){
+void ThreeWayValve::moveToHot(){
 
 }

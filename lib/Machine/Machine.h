@@ -11,6 +11,7 @@
 #include "SingleRelay.h"                 // Include the SingleRelay class
 #include "HeatCircuitOptions.h"          // Include the HeatCircuitComponentsOptions class
 #include "Configuration.h"               // Include the Configuration class
+#include "ThreeWayValveOptions.h"        // Include the ThreeWayValveOptions class
 
 #include "MillisTimeline.h"
 
@@ -35,19 +36,22 @@ private:
 
     HeatCircuit *constructHeatingCircuit(cobold::configuration::IConfiguration *section)
     {
+        section->getSection("valve");
+
+        auto valveOptions = ThreeWayValveOptions(
+            atoi(section->getValue("hotRelayPin").c_str()),
+            atoi(section->getValue("coldRelayPin").c_str()));
+
         HeatCircuitComponentsOptions options(
             atoi(section->getValue("thermistorPin").c_str()),
-            atoi(section->getValue("hotRelayPin").c_str()),
-            atoi(section->getValue("coldRelayPin").c_str()),
             atoi(section->getValue("pumpRelayPin").c_str()),
-            atof(section->getValue("targetTemperature").c_str()));
+            atof(section->getValue("targetTemperature").c_str())
+            , valveOptions);
 
         cobold::sensors::ThermistorTemperatureSensor *ts = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(options.getThermistorPin(), false, 10000, 10000, 30, 3950, 5));
 
-        ThreeWayValve threeWayValve(
-            new SingleRelay(services, options.getHotRelayPin()),
-            new SingleRelay(services, options.getColdRelayPin()));
+        ThreeWayValve threeWayValve(services, options.getThreeWayValveOptions());
 
         cobold::actuators::IRelay *waterPump = new SingleRelay(services, options.getPumpRelayPin());
 

@@ -37,12 +37,13 @@ public:
 
   void controlHeating()
   {
+    // Read the current feeder temperature
     float currentTemp = temperatureSensor->getTemperatureCelsius();
 
     // Apply hysteresis around the target temperature
     if (currentTemp < targetTemperature - 10.0)
     {
-      threeWayValve->moveToCHot();
+      threeWayValve->moveToHot();
     }
     else if (currentTemp > targetTemperature + 10.0)
     {
@@ -55,7 +56,9 @@ public:
       threeWayValve->moveToCold(); // Move to cold to prevent overheating
     }
 
-    // Turn on the water pump if the current temperature is below the target temperature minus 0.5 degrees
+    // Turn on the water pump if the current temperature is below the target 
+    // temperature minus 0.5 degrees Celsius. This is to prevent the pump from
+    // switching on and off too often.
     if (currentTemp < targetTemperature - 0.5)
     {
       waterPump->open();
@@ -65,13 +68,20 @@ public:
       waterPump->close();
     }
   }
-
+  
+  /**
+   * Set the target temperature based on the current outside temperature.
+  */
   void setOutsideTemperatue(float currentOutsideTemp)
   {
     float desiredIndoorTemp = heatingCurve(currentOutsideTemp);
     targetTemperature = desiredIndoorTemp;
   }
 
+  /**
+   * Initialize the heat circuit.
+   * This method is called once when the system is started.
+  */
   void initialize() override
   {
     waterPump->close();
