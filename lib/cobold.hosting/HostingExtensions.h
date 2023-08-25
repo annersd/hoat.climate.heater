@@ -21,7 +21,7 @@ namespace cobold
             static std::vector<cobold::hosting::IHostedService *> GetHostedServices(ServiceCollection *serviceCollection)
             {
                 std::vector<cobold::hosting::IHostedService *> servicesList;
-                Logging *logger = serviceCollection->getService<Logging>();
+                ILogger *logger = serviceCollection->getService<ILogger>();
 
                 // Check the existing services map
                 for (auto it = serviceCollection->services.begin(); it != serviceCollection->services.end(); ++it)
@@ -30,7 +30,7 @@ namespace cobold
 
                     if (cobold::hosting::HostingExtensions::isHostedService(typeWrapper))
                     {
-                        logger->verboseln("Service found");
+                        logger->verbose("Service found");
                         void *servicePtr = it->second();
                         cobold::hosting::IHostedService *service = reinterpret_cast<cobold::hosting::IHostedService *>(servicePtr);
                         if (service)
@@ -67,7 +67,7 @@ namespace cobold
                         }
                         else
                         {
-                            logger->verboseln("Service found, creating new instance");
+                            logger->verbose("Service found, creating new instance");
                             void *newService = constructorIt->second(serviceCollection);
                             serviceCollection->services[typeWrapper] = [newService]() -> void *
                             { return newService; };

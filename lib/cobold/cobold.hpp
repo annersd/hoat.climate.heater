@@ -31,3 +31,6 @@
 #include "IHost.h"
 #include "IHostBuilder.h"
 #include "IHostedService.h"
+
+// Include Logging
+#include "ILogger.h"

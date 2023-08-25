@@ -63,6 +63,8 @@ namespace cobold
             serviceCollection->addService<Logging>([](ServiceCollection *services) -> void *
                                                    { return &Log; });
 
+            serviceCollection->addService<ILogger>([](ServiceCollection *services) -> void *
+                                                   { return new ILogger(); });
             Log.verbose("HostBuilder::build() - Building Services Collection...");
 
             serviceCollection->addService<cobold::configuration::IConfiguration>(configuration);
@@ -78,12 +80,12 @@ namespace cobold
                 serviceConfigLambda(serviceCollection);
             }
 
-            Logging *logger = serviceCollection->getService<Logging>();
-            logger->verboseln("HostBuilder::build() - Services Collection built...");
+            ILogger *logger = serviceCollection->getService<ILogger>();
+            logger->verbose("HostBuilder::build() - Services Collection built...");
 
-            logger->verboseln("HostBuilder::build() - Creating Host...");
+            logger->verbose("HostBuilder::build() - Creating Host...");
             auto host = new Host(serviceCollection);
-            logger->verboseln("HostBuilder::build() - Host created...");
+            logger->verbose("HostBuilder::build() - Host created...");
 
             return host;
         }

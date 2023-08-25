@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>    // Include the Arduino library
-#include <ArduinoLog.h> // Include the ArduinoLog library
 #include "cobold.hpp"
 #include "Configuration.h"
 #include "HostingExtensions.h"
@@ -16,7 +15,7 @@ namespace cobold
         private:
             /* data */
             ServiceCollection *serviceCollection;
-            Logging *logger;
+            ILogger *logger;
 
         public:
             explicit Host(ServiceCollection *serviceCollection);
@@ -29,7 +28,7 @@ namespace cobold
         Host::Host(ServiceCollection *serviceCollection)
         {
             this->serviceCollection = serviceCollection;
-            logger = serviceCollection->getService<Logging>();
+            logger = serviceCollection->getService<ILogger>();
         }
 
         Host::~Host()
@@ -38,16 +37,16 @@ namespace cobold
 
         void Host::start()
         {
-            logger->verboseln("Host::start()");
+            logger->verbose("Host::start()");
             // get all the services that implement IHostedService
             auto hostedServices = cobold::hosting::HostingExtensions::GetHostedServices(serviceCollection);
 
             for (auto hostedService : hostedServices)
             {
-                logger->verboseln("Host::start() - starting hosted service");
+                logger->verbose("Host::start() - starting hosted service");
                 hostedService->start();
             }
-            logger->verboseln("Host::start() - done");
+            logger->verbose("Host::start() - done");
         }
 
         void Host::stop()

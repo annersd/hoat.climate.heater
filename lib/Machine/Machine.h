@@ -22,7 +22,7 @@ class Machine : /*public cobold::components::IComponent, */public cobold::hostin
 {
 private:
     ServiceCollection *services;
-    Logging *logger;
+    ILogger *logger;
     bool isRunning;
 
     HeatCircuit *hcFloor;
@@ -64,13 +64,13 @@ public:
     Machine(ServiceCollection *services) : isRunning(false){
         // Constructor initialization
         this->services = services;
-        logger = services->getService<Logging>();
-        logger->noticeln("Machine::Machine()");
+        logger = services->getService<ILogger>();
+        logger->info("Machine::Machine()");
     }
 
     void update()  ///override
     {
-        logger->noticeln("Updating machine...");
+        logger->info("Updating machine...");
         // Update the machine's state or perform periodic tasks
 
         // timeline->update();
@@ -89,27 +89,27 @@ public:
 
     void initialize() //override
     {
-        logger->noticeln("Initializing machine...");
+        logger->info("Initializing machine...");
 
         // Perform machine initialization tasks here
-        logger->verboseln("Initializing timeline...");
+        logger->info("Initializing timeline...");
         timeline = new MillisTimeline();
         timeline->initialize();
 
         // Get the section for heating.circuit.floor
-        logger->verboseln("Initializing floor heating circuit...");
+        logger->info("Initializing floor heating circuit...");
         cobold::configuration::IConfiguration *floorSection = Config->getSection("heating.circuit.floor");
         hcFloor = constructHeatingCircuit(floorSection);
         delete floorSection;
 
         // Get the section for heating.circuit.heater
-        logger->verboseln("Initializing heater heating circuit...");
+        logger->info("Initializing heater heating circuit...");
         cobold::configuration::IConfiguration *heaterSection = Config->getSection("heating.circuit.heater");
         hcHeater = constructHeatingCircuit(heaterSection);
         delete heaterSection;
 
         // Create outside temperature sensor
-        logger->verboseln("Initializing outside temperature sensor...");
+        logger->info("Initializing outside temperature sensor...");
         int THERMISTOR_PIN_3 = atoi(Config->getValue("heating.circuit.outside.thermistor.pin").c_str());
         hsOutside = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(THERMISTOR_PIN_3, false, 10000, 10000, 30, 3950, 5));
@@ -118,7 +118,7 @@ public:
 
     void start() override 
     {
-        logger->noticeln("Starting machine...");
+        logger->info("Starting machine...");
         delay(1000);
         isRunning = true;
         
@@ -130,7 +130,7 @@ public:
 
     void stop() override
     {
-        logger->noticeln("Stopping machine...");
+        logger->info("Stopping machine...");
         isRunning = false;
     }
 

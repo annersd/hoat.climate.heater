@@ -53,7 +53,7 @@ private:
      * @brief A pointer to the logger service.
      * The logger service is set during construction and cannot be changed afterwards.
      */
-    Logging *logger;
+    ILogger *logger;
 
 public:
     /**

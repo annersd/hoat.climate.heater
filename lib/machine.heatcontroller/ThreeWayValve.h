@@ -14,7 +14,7 @@ cobold::actuators::IRelay* openHotRelay;
 cobold::actuators::IRelay* openColdRelay;
 
 ServiceCollection *services;
-Logging *logger;
+ILogger *logger;
 
 public:
     ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions options);
@@ -27,7 +27,7 @@ public:
 ThreeWayValve::ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions options)
 {
     this->services = services;
-    this->logger = services->getService<Logging>();
+    this->logger = services->getService<ILogger>();
     this->openHotRelay = new SingleRelay(services, options.getHotPin());
     this->openColdRelay = new SingleRelay(services, options.getColdPin());
 }

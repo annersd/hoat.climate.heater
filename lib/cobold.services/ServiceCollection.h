@@ -2,7 +2,6 @@
 #include <Arduino.h>    // Include the Arduino library
 #include <ArduinoLog.h> // Include the ArduinoLog library
 
-#include "cobold.hpp"
 #include <map>
 #include <functional>
 #include <typeinfo>

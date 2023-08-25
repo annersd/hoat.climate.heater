@@ -5,7 +5,7 @@
 #include "HostingExtensions.h"
 
 cobold::hosting::IHost *host; // Declare a pointer to the Host class
-Logging *logger;
+ILogger *logger;
 
 void setup()
 {
@@ -54,7 +54,7 @@ void setup()
 
     host = hostBuilder->build();
 
-    logger = host->getServices()->getService<Logging>();
+    logger = host->getServices()->getService<ILogger>();
 
     host->start();
   }
@@ -69,14 +69,14 @@ void loop()
 {
   try
   {
-    logger->noticeln("Looping...");
+    logger->info("Looping...");
 
     Machine *machine = host->getServices()->getService<Machine>();
     machine->update();
     
 
     delay(1000);
-    logger->noticeln("Loop complete");
+    logger->info("Loop complete");
   }
   catch (const std::exception &e)
   {

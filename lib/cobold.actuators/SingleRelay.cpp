@@ -4,7 +4,7 @@ SingleRelay::SingleRelay(ServiceCollection *services, int relayPin, cobold::actu
     : pin(relayPin), normalState(defaultNormalState), currentState(defaultNormalState)
 {
     this->services = services;
-    logger = services->getService<Logging>();
+    logger = services->getService<ILogger>();
 
     // Initialize the relay
     initialize();
@@ -53,7 +53,7 @@ void SingleRelay::initialize()
 
 void SingleRelay::setRelayState(cobold::actuators::RelayState newState)
 {
-    logger->infoln("Changing relay state on pin %d to %s", pin, (newState == cobold::actuators::RelayState::CLOSED ? "CLOSED" : "OPENED"));
+    logger->info("Changing relay state on pin %d to %s", pin, (newState == cobold::actuators::RelayState::CLOSED ? "CLOSED" : "OPENED"));
     digitalWrite(pin, newState == normalState ? HIGH : LOW);
     currentState = newState;
 }
