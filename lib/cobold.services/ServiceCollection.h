@@ -1,12 +1,13 @@
 #pragma once
 #include <Arduino.h>    // Include the Arduino library
-#include <ArduinoLog.h> // Include the ArduinoLog library
+
 
 #include <map>
 #include <functional>
 #include <typeinfo>
 
 #include "TypeWrapper.h"
+#include "ILogger.h"
 
 /**
  * @brief Class for managing a collection of services using dependency injection.
@@ -14,10 +15,10 @@
 class ServiceCollection
 {
 public:
-    ServiceCollection(Logging *logger)
+    ServiceCollection(ILogger *logger)
     {
         this->logger = logger;
-        logger->verboseln("ServiceCollection constructor");
+        logger->verbose("ServiceCollection constructor");
         services = {};
         constructorMap = {};
     }
@@ -87,19 +88,19 @@ public:
         ITypeWrapper *typeWrapper = new TypeWrapper<T>();
         std::string typeName = typeWrapper->GetTypeName();
 
-        logger->verboseln("Looking for service: %s", String(typeName.c_str()));
+        logger->verbose("Looking for service: %s", String(typeName.c_str()));
 
         // Check in the services map
-        logger->verboseln("Checking services map");
+        logger->verbose("Checking services map");
         auto it = services.begin();
         while (it != services.end())
         {
-            logger->verboseln("Checking service: %s", it->first->GetTypeName().c_str());
+            logger->verbose("Checking service: %s", it->first->GetTypeName().c_str());
             ITypeWrapper *wrapper = it->first;
 
             if (wrapper->GetTypeName() == typeName)
             {
-                logger->verboseln("Service found");
+                logger->verbose("Service found");
                 void *servicePtr = it->second();
                 delete typeWrapper; // Clean up typeWrapper
                 return reinterpret_cast<T *>(servicePtr);
@@ -108,14 +109,14 @@ public:
         }
 
         // Check in the constructorMap
-        logger->verboseln("Checking constructorMap");
+        logger->verbose("Checking constructorMap");
         auto constructorIt = constructorMap.begin();
         while (constructorIt != constructorMap.end())
         {
             ITypeWrapper *wrapper = constructorIt->first;
             if (wrapper->GetTypeName() == typeName)
             {
-                logger->verboseln("Service found, creating new instance");
+                logger->verbose("Service found, creating new instance");
                 void *newService = constructorIt->second(this);
                 services[typeWrapper] = [newService]() -> void *
                 { return newService; };
@@ -126,7 +127,7 @@ public:
         }
 
         delete typeWrapper; // Clean up typeWrapper
-        logger->verboseln("Service not found and no constructor available");
+        logger->verbose("Service not found and no constructor available");
         return nullptr;
     }
 
@@ -163,5 +164,5 @@ public:
     std::map<ITypeWrapper *, std::function<void *()>> services = {};
     std::map<ITypeWrapper *, std::function<void *(ServiceCollection *)>> constructorMap = {};
     private:
-    Logging *logger;
+    ILogger *logger;
 };

@@ -35,7 +35,7 @@ namespace cobold
             // Initialize with log level and log output.
             Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-            serviceCollection = new ServiceCollection(&Log);
+            serviceCollection = new ServiceCollection(new ILogger());
             configuration = new cobold::configuration::Configuration();
         }
 
