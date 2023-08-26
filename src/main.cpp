@@ -31,6 +31,7 @@ void setup()
           config->setValue("heating.circuit.floor.valve.coldRelayPin", "6");
           config->setValue("heating.circuit.floor.pumpRelayPin", "3");
           config->setValue("heating.circuit.floor.targetTemperature", "21.0");
+          config->setValue("heating.circuit.floor.maxSystemTemperature", "40.0");
 
           // configure heater heating circuits
           config->setValue("heating.circuit.heater.enabled", "true");
@@ -40,6 +41,7 @@ void setup()
           config->setValue("heating.circuit.heater.valve.coldRelayPin", "6");
           config->setValue("heating.circuit.heater.pumpRelayPin", "4");
           config->setValue("heating.circuit.heater.targetTemperature", "21.0");
+          config->setValue("heating.circuit.heater.maxSystemTemperature", "70.0");
 
           // configure thermistor for outside tmeperatue
           config->setValue("heating.circuit.outside.thermistor.pin", "2");

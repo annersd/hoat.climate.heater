@@ -29,8 +29,8 @@ private:
     HeatCircuit *hcHeater;
     cobold::sensors::ITemperatureSensor *hsOutside;
 
-    HeatCircuitComponentsOptions optionsFloor;
-    HeatCircuitComponentsOptions optionsHeater;
+    HeatCircuitOptions optionsFloor;
+    HeatCircuitOptions optionsHeater;
 
     cobold::time::ITimeline *timeline;
 
@@ -42,11 +42,12 @@ private:
             atoi(section->getValue("hotRelayPin").c_str()),
             atoi(section->getValue("coldRelayPin").c_str()));
 
-        HeatCircuitComponentsOptions options(
+        HeatCircuitOptions options(
             atoi(section->getValue("thermistorPin").c_str()),
             atoi(section->getValue("pumpRelayPin").c_str()),
-            atof(section->getValue("targetTemperature").c_str())
-            , valveOptions);
+            atof(section->getValue("targetTemperature").c_str()),
+            atof(section->getValue("maxSystemTemperature").c_str()),
+            valveOptions);
 
         cobold::sensors::ThermistorTemperatureSensor *ts = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(options.getThermistorPin(), false, 10000, 10000, 30, 3950, 5));
@@ -55,7 +56,7 @@ private:
 
         cobold::actuators::IRelay *waterPump = new SingleRelay(services, options.getPumpRelayPin());
 
-        return new HeatCircuit(ts, &threeWayValve, waterPump, options.getTargetTemperature());
+        return new HeatCircuit(ts, &threeWayValve, waterPump, options.getTargetTemperature(), options.getMaxSystemTemperature());
     }
 
 public:

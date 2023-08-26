@@ -47,7 +47,9 @@ namespace cobold
             }
             void initialize() override
             {
+
             }
+
             float getTemperatureCelsius() override
             {
                 return thermistor->readTemperature();

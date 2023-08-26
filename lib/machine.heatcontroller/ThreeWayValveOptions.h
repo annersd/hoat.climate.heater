@@ -1,5 +1,11 @@
 #pragma once
 
+/**
+ * @brief Options for a three-way valve
+ * 
+ * @details
+ * This class is used to configure a three-way valve.
+*/
 class ThreeWayValveOptions {
 private:
     int hotPin;

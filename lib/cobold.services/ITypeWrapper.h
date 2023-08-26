@@ -39,6 +39,19 @@ public:
 
     virtual ~ITypeWrapper() {}
 
+    /**
+     * @brief Get the value of the specified property.
+     *
+     * @param key The key of the property.
+     * @return The value of the property.
+     */
     virtual std::string GetProperty(const std::string &key) const = 0;
+
+    /**
+     * @brief Set the value of the specified property.
+     *
+     * @param key The key of the property.
+     * @param value The value of the property.
+     */
     virtual void SetProperty(const std::string &key, const std::string &value) = 0;
 };

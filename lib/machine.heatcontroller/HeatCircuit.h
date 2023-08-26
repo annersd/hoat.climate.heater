@@ -4,12 +4,21 @@
 #include <cobold.hpp>
 #include "ThreeWayValve.h"
 
-
+/**
+ * @brief Controls the heat circuit
+ * 
+ * @details
+ * This class is used to control the heat circuit.
+ * It contains the logic for controlling the three-way valve and water pump.
+*/
 class HeatCircuit : public cobold::components::IComponent
 {
 private:
+  HeatCircuitOptions options;
+
   cobold::sensors::ITemperatureSensor *temperatureSensor;
   float targetTemperature; 
+  float maxSystemTemperature;
   ThreeWayValve *threeWayValve;
   cobold::actuators::IRelay *waterPump;
 
@@ -27,12 +36,15 @@ private:
   }
 
 public:
-  HeatCircuit(cobold::sensors::ITemperatureSensor *hcTemeraturSensor, ThreeWayValve *threeWayValve, cobold::actuators::IRelay *waterPump, float targetTemp)
+  HeatCircuit(cobold::sensors::ITemperatureSensor *hcTemeraturSensor, ThreeWayValve *threeWayValve, 
+  cobold::actuators::IRelay *waterPump, float targetTemp, float maxSystemTemp)
       : temperatureSensor(hcTemeraturSensor),
         targetTemperature(targetTemp),
+        maxSystemTemperature(maxSystemTemp),
         threeWayValve(threeWayValve),
         waterPump(waterPump)
   {
+    
   }
 
   void controlHeating()
@@ -43,17 +55,17 @@ public:
     // Apply hysteresis around the target temperature
     if (currentTemp < targetTemperature - 10.0)
     {
-      threeWayValve->moveToHot();
+      threeWayValve->moveToHot(2.0F);
     }
     else if (currentTemp > targetTemperature + 10.0)
     {
-      threeWayValve->moveToCold();
+      threeWayValve->moveToCold(2.0F);
     }
 
     // Ensure the absolute maximum temperature is not exceeded
-    if (currentTemp > 70.0)
+    if (currentTemp > maxSystemTemperature)
     {
-      threeWayValve->moveToCold(); // Move to cold to prevent overheating
+      threeWayValve->moveToCold(5.0F); // Move to cold to prevent overheating
     }
 
     // Turn on the water pump if the current temperature is below the target 
@@ -87,7 +99,7 @@ public:
     waterPump->close();
 
     // move the valve to cold to ensure the valve is in a known state
-    threeWayValve->moveToCold();
+    threeWayValve->moveToCold( 10.0F );
   }
 
   void update() override
