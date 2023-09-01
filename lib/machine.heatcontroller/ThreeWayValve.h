@@ -29,11 +29,11 @@ private:
     ServiceCollection *services;
     ILogger *logger;
     ThreeWayValveOptions *options;
+    cobold::time::ITimeline *timeLine;
 
     // The state of the valve
     bool isMoving;
     ValveMovementDirection movementDirection;
-    cobold::time::ITimeline *timeLine;
     unsigned long long startTime;
     float movementDuration;
 

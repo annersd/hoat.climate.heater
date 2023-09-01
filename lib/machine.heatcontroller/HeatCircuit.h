@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <cobold.hpp>
 #include "ThreeWayValve.h"
+#include "HeatCircuitOptions.h"
 
 /**
  * @brief Controls the heat circuit

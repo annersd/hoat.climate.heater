@@ -10,7 +10,7 @@ ILogger *logger;
 void setup()
 {
   Serial.begin(115200); // Initialize default serial communication at 115200 baud
-  Serial.println("Starting setup...");
+  Serial.println("--- Starting setup ---");
 
   try
   {
@@ -47,22 +47,28 @@ void setup()
           config->setValue("heating.circuit.outside.thermistor.pin", "2");
         });
 
+    // Configure services
     hostBuilder->configureServices(
         [](ServiceCollection *services) -> void
         {
           cobold::hosting::HostingExtensions::addHostedService<Machine>(services, [](ServiceCollection *services) -> void *
                                                                         { return new Machine(services); });
+        
+          services->addService<cobold::time::ITimeline>(new MillisTimeline());
         });
 
+    // Build the host
     host = hostBuilder->build();
 
+    // Get the logger
     logger = host->getServices()->getService<ILogger>();
 
+    // Start the host
     host->start();
   }
   catch (const std::exception &e)
   {
-    Serial.println("Exception caught");
+    Serial.println("--- Unhandled Exception in startup caught ---");
     Serial.println(e.what());
   }
 }
@@ -76,13 +82,12 @@ void loop()
     Machine *machine = host->getServices()->getService<Machine>();
     machine->update();
     
-
     delay(1000);
-    logger->info("Loop complete");
+    logger->debug("Loop complete");
   }
   catch (const std::exception &e)
   {
-    Serial.println("Exception caught");
+    Serial.println("--- Unhandled Exception in default loop caught ---");
     Serial.println(e.what());
   }
 }
