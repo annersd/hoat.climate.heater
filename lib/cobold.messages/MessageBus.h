@@ -40,12 +40,18 @@ public:
         subscribers.erase(receicerId);
     }
 
-    // pump messages from the message queue and call the appropriate callbacks for each message
+    /**
+     * @brief Pump messages from the queue and call the callback for the message receiver
+     * @details This function is called from a task. It waits for a message to arrive and
+     *          then calls the callback for the message receiver.
+     */
     void pumpMessages()
     {
         Message message;
+        // wait for a message to arrive
         while (xQueueReceive(xQueue1, &message, portMAX_DELAY) == pdTRUE)
         {
+            // call the callback for the message receiver
             if (subscribers.find(message.receiverId) != subscribers.end())
             {
                 subscribers[message.receiverId](message);
