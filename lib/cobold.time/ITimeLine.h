@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../cobold.components/IComponent.h"
+#include "IComponent.h"
 
 namespace cobold {
     namespace time {
