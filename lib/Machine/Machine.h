@@ -13,7 +13,7 @@
 #include "Configuration.h"               // Include the Configuration class
 #include "ThreeWayValveOptions.h"        // Include the ThreeWayValveOptions class
 
-#include "MillisTimeline.h"
+#include "SoftwareTimeline.h"
 
 #include <iostream>
 #include <string>
@@ -94,7 +94,7 @@ public:
 
         // Perform machine initialization tasks here
         logger->info("Initializing timeline...");
-        timeline = new MillisTimeline();
+        timeline = new SoftwareTimeline(0,0);
         timeline->initialize();
 
         // Get the section for heating.circuit.floor

@@ -54,7 +54,7 @@ void setup()
           cobold::hosting::HostingExtensions::addHostedService<Machine>(services, [](ServiceCollection *services) -> void *
                                                                         { return new Machine(services); });
         
-          services->addService<cobold::time::ITimeline>(new MillisTimeline());
+          services->addService<cobold::time::ITimeline>(new SoftwareTimeline(0,0));
         });
 
     // Build the host
