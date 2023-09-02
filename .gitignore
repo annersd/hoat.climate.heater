@@ -37,3 +37,6 @@
 
 # accept anything in the tools folder
 !tools/*
+
+# exlude secrets
+src/secrets.h
