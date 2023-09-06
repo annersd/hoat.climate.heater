@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef SERVICECOLLECTION_H
+#define SERVICECOLLECTION_H
+
 #include <Arduino.h>    // Include the Arduino library
 
 
@@ -88,7 +92,7 @@ public:
         ITypeWrapper *typeWrapper = new TypeWrapper<T>();
         std::string typeName = typeWrapper->GetTypeName();
 
-        logger->verbose("Looking for service: %s", String(typeName.c_str()));
+        logger->verbose("Looking for service: %s", typeWrapper->GetTypeName().c_str());
 
         // Check in the services map
         logger->verbose("Checking services map");
@@ -166,3 +170,5 @@ public:
     private:
     ILogger *logger;
 };
+
+#endif // SERVICECOLLECTION_H

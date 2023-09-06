@@ -22,8 +22,8 @@ class ThreeWayValve
 {
 private:
     // The relays used to control the valve
-    cobold::actuators::IRelay *moveToHotRelay;
-    cobold::actuators::IRelay *moveToColdRelay;
+    cobold::actuators::IRelay* moveToHotRelay = nullptr;
+    cobold::actuators::IRelay* moveToColdRelay = nullptr;
 
     // The service collection and references to the services used by the valve 
     ServiceCollection *services;
@@ -69,8 +69,8 @@ public:
     void stopMoving()
     {
         logger->info("Stopping valve movement");
-        moveToColdRelay->close();
-        moveToHotRelay->close();
+        // moveToColdRelay->close();
+        // moveToHotRelay->close();
 
         isMoving = false;
         movementDirection = ValveMovementDirection::None;
@@ -101,6 +101,7 @@ ThreeWayValve::ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions o
     this->logger = services->getService<ILogger>();
     this->options = &options;
 
+    logger->info("Initializing three-way valve");
     // Initialize the relays
     this->moveToHotRelay = new SingleRelay(services, options.getHotPin());
     this->moveToColdRelay = new SingleRelay(services, options.getColdPin());
@@ -129,13 +130,30 @@ void ThreeWayValve::moveToCold(float duration)
     // this is to ensure the valve is in a known state
     stopMoving();
 
-    logger->info("Starting to move to cold for $s seconds", String(duration));
+    logger->info("Starting to move to cold for %s seconds", String(duration));
     isMoving = true;
     movementDirection = ValveMovementDirection::ToCold;
     movementDuration = duration;
-    startTime = timeLine->now();
-    moveToColdRelay->open();
+    // startTime = timeLine->now();
+    Serial.println(String(ESP.getFreeHeap()));
+    Serial.println(String(ESP.getFreePsram()));
+    if (moveToColdRelay == nullptr)
+        logger->error("moveToColdRelay is null");
+    
+    try
+    {
+        /* code */
+        if(moveToHotRelay != NULL)
+        moveToColdRelay->open();
+    }
+    catch(const std::exception& e)
+    {
+        logger->error("Error: %s", e.what());
+    }
+    
+    
 }
+
 
 void ThreeWayValve::moveToHot(float duration)
 {

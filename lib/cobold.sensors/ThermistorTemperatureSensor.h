@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <cobold.hpp>
 #include <Thermistor.h>
+#include <ThermistorTemperatureSensorOptions.h>
 
 namespace cobold
 {
@@ -26,10 +27,10 @@ namespace cobold
              * @brief Constructor.
              * @param pin The pin connected to the thermistor.
              */
-            ThermistorTemperatureSensor(int pin)
-                : thermistorPin(pin),
+            ThermistorTemperatureSensor(ThermistorTemperatureSensorOptions *options)
+                : thermistorPin(options->getPin()),
                   temperatureCelsius(0.0),
-                  thermistor(new Thermistor(pin))
+                  thermistor(new Thermistor(options->getPin()))
             {
             }
 

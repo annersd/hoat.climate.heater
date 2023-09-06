@@ -1,6 +1,10 @@
 #pragma once
 
-#include <cobold.hpp>
+#include <Arduino.h>
+#include "IRelay.h"
+#include "ServiceCollection.h"
+#include "ILogger.h"
+
 
 /**
  * @class SingleRelay

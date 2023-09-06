@@ -21,6 +21,7 @@
 // Include Service Collection
 #include "TypeWrapper.h"
 #include "ServiceCollection.h"
+#include "ServiceCollectionExtensions.h"
 #include "IHostedService.h"
 
 // Include Messages Bus and Messages
@@ -34,3 +35,6 @@
 
 // Include Logging
 #include "ILogger.h"
+
+#include "IApplication.h"
+

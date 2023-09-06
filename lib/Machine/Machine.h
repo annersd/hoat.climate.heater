@@ -52,11 +52,11 @@ private:
         cobold::sensors::ThermistorTemperatureSensor *ts = new cobold::sensors::ThermistorTemperatureSensor(
             new Thermistor(options.getThermistorPin(), false, 10000, 10000, 30, 3950, 5));
 
-        ThreeWayValve threeWayValve(services, options.getThreeWayValveOptions());
+        ThreeWayValve* threeWayValve = new ThreeWayValve(services, options.getThreeWayValveOptions());
 
         cobold::actuators::IRelay *waterPump = new SingleRelay(services, options.getPumpRelayPin());
 
-        return new HeatCircuit(ts, &threeWayValve, waterPump, options.getTargetTemperature(), options.getMaxSystemTemperature());
+        return new HeatCircuit(ts, threeWayValve, waterPump, options.getTargetTemperature(), options.getMaxSystemTemperature());
     }
 
 public:

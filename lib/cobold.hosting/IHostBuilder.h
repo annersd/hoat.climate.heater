@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cobold.hpp"
+#include "IConfiguration.h"
 #include "IHost.h"
 
 namespace cobold
@@ -35,7 +35,7 @@ namespace cobold
              *
              * @return A pointer to the built IHost instance.
              */
-            virtual IHost *build() = 0;
+            virtual cobold::hosting::IHost *build() = 0;
         };
     }
 }

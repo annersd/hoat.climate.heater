@@ -51,7 +51,9 @@ public:
      */
     cobold::time::timeline_t now() override
     {
-        return micros() - initialMicros + offset;
+        return millis() * 1000; 
+        // return micros() ;
+        // return micros() - initialMicros + offset;
     }
 
     /**

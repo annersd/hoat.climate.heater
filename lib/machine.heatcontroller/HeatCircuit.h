@@ -97,6 +97,7 @@ public:
   */
   void initialize() override
   {
+    
     waterPump->close();
 
     // move the valve to cold to ensure the valve is in a known state
