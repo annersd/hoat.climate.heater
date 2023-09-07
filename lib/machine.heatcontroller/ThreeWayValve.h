@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <cobold.hpp>
+#include <Cobold.hpp>
 #include "SingleRelay.h"
 #include "ThreeWayValveOptions.h"
 
@@ -27,7 +27,7 @@ private:
 
     // The service collection and references to the services used by the valve 
     ServiceCollection *services;
-    ILogger *logger;
+    cobold::Logger *logger;
     ThreeWayValveOptions *options;
     cobold::time::ITimeline *timeLine;
 
@@ -98,13 +98,13 @@ ThreeWayValve::ThreeWayValve(ServiceCollection *services, ThreeWayValveOptions o
 {
     // Store the references to the services
     this->services = services;
-    this->logger = services->getService<ILogger>();
+    this->logger = services->getService<cobold::Logger>();
     this->options = &options;
 
     logger->info("Initializing three-way valve");
     // Initialize the relays
-    this->moveToHotRelay = new SingleRelay(services, options.getHotPin());
-    this->moveToColdRelay = new SingleRelay(services, options.getColdPin());
+    this->moveToHotRelay = new SingleRelay(options.getHotPin());
+    this->moveToColdRelay = new SingleRelay(options.getColdPin());
 
     // Initialize the state of the valve
     isMoving = false;

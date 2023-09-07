@@ -1,10 +1,11 @@
 #include "SingleRelay.h"
+#include <Arduino.h>
 
-SingleRelay::SingleRelay(ServiceCollection *services, int relayPin, cobold::actuators::RelayState defaultNormalState)
+SingleRelay::SingleRelay(int relayPin, cobold::actuators::RelayState defaultNormalState)
     : pin(relayPin), normalState(defaultNormalState), currentState(defaultNormalState)
 {
-    this->services = services;
-    logger = services->getService<ILogger>();
+    // this->services = services;
+    // logger = services->getService<cobold::Logger>();
 
     // Initialize the relay
     initialize();
@@ -53,7 +54,7 @@ void SingleRelay::initialize()
 
 void SingleRelay::setRelayState(cobold::actuators::RelayState newState)
 {
-    logger->info("Changing relay state on pin %d to %s", pin, (newState == cobold::actuators::RelayState::CLOSED ? "CLOSED" : "OPENED"));
+    // logger->info("Changing relay state on pin %d to %s", pin, (newState == cobold::actuators::RelayState::CLOSED ? "CLOSED" : "OPENED"));
     digitalWrite(pin, newState == normalState ? HIGH : LOW);
     currentState = newState;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <cobold.hpp>
+#include <Cobold.hpp>
 #include "ThreeWayValve.h"
 #include "HeatCircuitOptions.h"
 

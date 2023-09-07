@@ -1,21 +1,8 @@
 
-#include <Arduino.h>
-#include "cobold.hpp"
+#include "Cobold.hpp"
+// #include "cobold_new.hpp"
 
-#include "IHost.h"
-#include "IHostBuilder.h"
-#include "HostingExtensions.h"
-#include "IConfiguration.h"
-
-// // Include Application
-// #include "IApplication.h"
-#include "Application.h"
-
-
-// #include <cobold.hpp>
 #include <Machine.h>
-// #include "Host.h" // Include the Host class
-// #include "HostBuilder.h"
 
 /**
  * @brief The secret WiFi SSID and password.
@@ -30,21 +17,17 @@
  */
 #include "secrets.h"
 
-
-
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWORD;
 
 cobold::hosting::IHost *host; // Declare a pointer to the Host class
-ILogger *logger;
+cobold::Logger *logger;
 
 void setup()
 {
   Serial.begin(115200); // Initialize default serial communication at 115200 baud
   Serial.println("--- Starting setup ---");
 
-
-  cobold::app = new cobold::Application();
   cobold::app->preSetup();
   cobold::app->setup();
 
@@ -98,7 +81,7 @@ void setup()
     host = hostBuilder->build();
 
     // Get the logger
-    logger = host->getServices()->getService<ILogger>();
+    logger = host->getServices()->getService<cobold::Logger>();
 
     // Start the host
     host->start();

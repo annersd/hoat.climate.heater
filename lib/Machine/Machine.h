@@ -2,7 +2,9 @@
 
 #include <Arduino.h>    // Include the Arduino library
 #include <ArduinoLog.h> // Include the ArduinoLog library
-#include "cobold.hpp"
+#include "Cobold.hpp" // Include the CoboldCore library
+#include "cobold_new.hpp"
+
 
 #include "HeatCircuit.h"                 // Include the HeatCircuit class
 #include "Thermistor.h"                  // Include the Thermistor class
@@ -10,7 +12,6 @@
 #include "ThreeWayValve.h"               // Include the ThreeWayValve class
 #include "SingleRelay.h"                 // Include the SingleRelay class
 #include "HeatCircuitOptions.h"          // Include the HeatCircuitComponentsOptions class
-#include "Configuration.h"               // Include the Configuration class
 #include "ThreeWayValveOptions.h"        // Include the ThreeWayValveOptions class
 
 #include "SoftwareTimeline.h"
@@ -22,7 +23,7 @@ class Machine : /*public cobold::components::IComponent, */public cobold::hostin
 {
 private:
     ServiceCollection *services;
-    ILogger *logger;
+    cobold::Logger *logger;
     bool isRunning;
 
     HeatCircuit *hcFloor;
@@ -54,7 +55,7 @@ private:
 
         ThreeWayValve* threeWayValve = new ThreeWayValve(services, options.getThreeWayValveOptions());
 
-        cobold::actuators::IRelay *waterPump = new SingleRelay(services, options.getPumpRelayPin());
+        cobold::actuators::IRelay *waterPump = new SingleRelay(options.getPumpRelayPin());
 
         return new HeatCircuit(ts, threeWayValve, waterPump, options.getTargetTemperature(), options.getMaxSystemTemperature());
     }
@@ -65,7 +66,7 @@ public:
     Machine(ServiceCollection *services) : isRunning(false){
         // Constructor initialization
         this->services = services;
-        logger = services->getService<ILogger>();
+        logger = services->getService<cobold::Logger>();
         logger->info("Machine::Machine()");
     }
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Arduino.h>
+
 #include "IRelay.h"
-#include "ServiceCollection.h"
-#include "ILogger.h"
+
 
 
 /**
@@ -45,7 +44,7 @@ private:
      * @brief A pointer to the service collection.
      * The service collection is set during construction and cannot be changed afterwards.
     */
-    ServiceCollection *services;
+    // ServiceCollection *services;
 
     /**
      * @brief Set the relay state.
@@ -57,7 +56,7 @@ private:
      * @brief A pointer to the logger service.
      * The logger service is set during construction and cannot be changed afterwards.
      */
-    ILogger *logger;
+    // cobold::Logger *logger;
 
 public:
     /**
@@ -65,7 +64,7 @@ public:
      * @param relayPin The pin number connected to the relay.
      * @param defaultNormalState The default normal state of the relay (open or closed).
      */
-    SingleRelay(ServiceCollection *services, int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
+    SingleRelay(int relayPin, cobold::actuators::RelayState defaultNormalState = cobold::actuators::RelayState::CLOSED);
 
     // Methods to control the relay
 

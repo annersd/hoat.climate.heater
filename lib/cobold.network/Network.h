@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "CoboldCore.hpp"
 
 #ifdef ESP32
 #include <WiFi.h>
@@ -13,14 +14,12 @@
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
 
-#include "ILogger.h"
-
 class Network
 {
 private:
     const char *ssid = nullptr;
     const char *password = nullptr;
-    ILogger *logger;
+    cobold::Logger *logger;
 
 public:
     Network(const char *ssid, const char *password);

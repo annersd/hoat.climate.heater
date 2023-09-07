@@ -1,6 +1,8 @@
 #pragma once
 
-#include "cobold.hpp"
+#include "Cobold.hpp"
+#include "cobold_new.hpp"
+#include "ITemperatureSensor.h"
 
 class ThermalStorageTank
 {
@@ -24,5 +26,5 @@ public:
 class ThermalStorageTankOptions
 {   
 private:
-    std::vector<cobold::sensors::ITemperatureSensorOptions *> temperatureSensorOptions;
+    // std::vector<cobold::sensors:: *> temperatureSensorOptions;
 };
