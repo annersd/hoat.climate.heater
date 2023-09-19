@@ -21,6 +21,7 @@ The Storage reports its temperatures and approximal current used capacity
 |property|type|description|
 |--------|----|-----------|
 | chargeLevel | float | The current charging Level of the complete Storage in watt/hour. This Level is an estamtion over all temperature zones. This means heat charger may not charge the storage, when the charging zone has a higher temperature.|
+| stackTemperatures | array<float> | Rports the current temeratures in the stack from bottom to top in degree celcius. |
 
 Payload
 ``` json
