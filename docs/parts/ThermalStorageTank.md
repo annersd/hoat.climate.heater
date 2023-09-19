@@ -11,3 +11,16 @@ from lower to hicher areas in the stack
 - temp_2
 - temp_3
 - temp_4
+
+## Events
+
+### Current Status
+The Storage reports its temperatures and approximal current used capacity 
+
+Payload
+``` json
+{
+  "chargeLevel": 2.51,
+  "stackTemperatures": [12.5, 40.3, 58.9, 70.23]
+}
+```
